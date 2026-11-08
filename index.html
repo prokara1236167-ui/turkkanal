@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidWave</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SUPABASE KÜTÜPHANESİ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ========================================= */
+    /* RENK VE TEMA DEĞİŞKENLERİ                 */
+    /* ========================================= */
+    :root { 
+        --theme-main: #2563eb; 
+        --theme-hover: #3b82f6; 
+        --theme-text: #60a5fa; 
+        --theme-glow: rgba(37, 99, 235, 0.2); 
+    }
+    body[data-color="green"] { --theme-main: #16a34a; --theme-hover: #22c55e; --theme-text: #4ade80; --theme-glow: rgba(22, 163, 74, 0.2); }
+    body[data-color="yellow"] { --theme-main: #ca8a04; --theme-hover: #eab308; --theme-text: #fde047; --theme-glow: rgba(202, 138, 4, 0.2); }
+    body[data-color="red"] { --theme-main: #dc2626; --theme-hover: #ef4444; --theme-text: #f87171; --theme-glow: rgba(220, 38, 38, 0.2); }
+    body[data-color="purple"] { --theme-main: #9333ea; --theme-hover: #a855f7; --theme-text: #c084fc; --theme-glow: rgba(147, 51, 234, 0.2); }
+
+    body { 
+        background-color: #0f0f0f; color: #f1f1f1; 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        transition: background-color 0.3s, color 0.3s; 
+    }
+
+    /* SCROLLBAR AYARLARI */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f3f; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    
+    .glass { background: rgba(33, 33, 33, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* SHORTS KAYDIRMA (SNAP) EFEKTİ */
+    .snap-container { 
+        scroll-snap-type: y mandatory; overflow-y: scroll; 
+        height: calc(100vh - 4rem); scroll-behavior: smooth;
+    }
+    .snap-item { scroll-snap-align: start; height: calc(100vh - 4rem); }
+
+    /* DİNAMİK TEMA SINIFLARI */
+    .theme-bg { background-color: var(--theme-main); transition: background-color 0.3s; }
+    .theme-bg:hover { background-color: var(--theme-hover); }
+    .theme-text { color: var(--theme-text); transition: color 0.3s; }
+    .theme-border:focus, .theme-border:focus-within { border-color: var(--theme-main) !important; }
+    .theme-shadow { box-shadow: 0 4px 14px 0 var(--theme-glow); }
+    .group:hover .group-hover-theme-text { color: var(--theme-text); }
+    .theme-progress { background-color: var(--theme-glow); border: 1px solid var(--theme-main); color: var(--theme-text); }
+    
+    /* AYDINLIK TEMA (LIGHT MODE) */
+    body.light-mode { background-color: #f9fafb !important; color: #111827 !important; }
+    body.light-mode .bg-\[\#0f0f0f\] { background-color: #f9fafb !important; }
+    body.light-mode .bg-\[\#121212\] { background-color: #ffffff !important; border-color: #e5e7eb !important; }
+    body.light-mode .bg-\[\#181818\] { background-color: #f3f4f6 !important; }
+    body.light-mode .bg-\[\#212121\] { background-color: #ffffff !important; }
+    body.light-mode .bg-\[\#272727\] { background-color: #e5e7eb !important; color: #111827 !important; }
+    body.light-mode .border-\[\#272727\], body.light-mode .border-\[\#303030\], body.light-mode .border-\[\#333\] { border-color: #d1d5db !important; }
+    body.light-mode .text-gray-400 { color: #4b5563 !important; }
+    body.light-mode .text-gray-200 { color: #1f2937 !important; }
+    body.light-mode .text-white { color: #000000 !important; }
+    body.light-mode .glass { background: rgba(255, 255, 255, 0.9) !important; border: 1px solid rgba(0, 0, 0, 0.1) !important; }
+    body.light-mode input, body.light-mode textarea, body.light-mode select { color: #000 !important; }
+
+    /* TOAST ANIMASYONU */
+    #toastContainer { transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(100%); opacity: 0; }
+    #toastContainer.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden" data-color="blue">
+
+  <!-- ÜST BAR (NAVBAR) -->
+  <header class="h-16 border-b border-[#272727] bg-[#0f0f0f]/95 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 z-40 shrink-0 sticky top-0">
+    <div class="flex items-center gap-4">
+      <a href="javascript:void(0)" onclick="switchView('homeView')" class="flex items-center gap-2 text-2xl font-bold tracking-tighter hover:scale-105 transition-transform text-white">
+        <div class="w-8 h-8 theme-bg rounded-lg flex items-center justify-center theme-shadow"><i class="fa-solid fa-play text-white text-sm"></i></div>
+        <span>VidWave</span>
+      </a>
+      <button onclick="switchView('shortsView')" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-[#272727] transition-colors font-bold text-sm text-gray-300 hover:text-white">
+        <i class="fa-solid fa-bolt theme-text"></i> <span class="hidden sm:inline">Shorts</span>
+      </button>
+    </div>
+
+    <div class="flex items-center flex-1 max-w-2xl mx-6 hidden md:flex">
+      <div class="flex w-full items-center bg-[#121212] border border-[#303030] rounded-full overflow-hidden theme-border transition-colors">
+        <div class="pl-4 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <input type="text" id="searchInput" placeholder="Video veya Kanal ara..." class="w-full bg-transparent px-3 py-2.5 outline-none text-sm font-medium text-white">
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 sm:gap-4">
+      <div class="relative hidden sm:block" id="notifContainer">
+        <button onclick="toggleNotifs()" class="w-10 h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative">
+          <i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0f0f0f]"></span>
+        </button>
+        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 bg-[#212121] border border-[#333] rounded-xl shadow-2xl z-50 overflow-hidden">
+          <div class="px-4 py-3 border-b border-[#333] font-bold text-white flex justify-between items-center">Bildirimler <button onclick="clearNotifs()" class="text-xs text-gray-400 hover:text-white transition-colors">Temizle</button></div>
+          <div id="notifList" class="max-h-64 overflow-y-auto p-2"><p class="text-xs text-gray-500 text-center py-4">Bildirim yok</p></div>
+        </div>
+      </div>
+
+      <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white" title="Tema">
+        <i id="themeIcon" class="fa-solid fa-sun"></i>
+      </button>
+
+      <!-- Giriş Yapmış Kullanıcı -->
+      <div id="userSection" class="hidden flex items-center gap-3 sm:gap-4">
+        <button id="createChannelBtn" onclick="openModal('channelModal')" class="hidden theme-bg text-white px-4 py-2 rounded-full text-sm font-bold theme-shadow hover:scale-105 transition-transform">Kanal Oluştur</button>
+        <button id="uploadVideoBtn" onclick="openModal('uploadModal')" class="hidden flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-medium transition-colors text-white">
+          <i class="fa-solid fa-video theme-text"></i> <span class="hidden sm:inline">Oluştur</span>
+        </button>
+        
+        <div class="relative group cursor-pointer" onclick="toggleDropdown()">
+          <img id="navAvatar" src="" class="w-9 h-9 rounded-full object-cover border border-[#303030] transition-colors hover:border-blue-500">
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#212121] border border-[#333] rounded-xl shadow-2xl py-2 z-50">
+            <div class="px-4 py-3 border-b border-[#333] mb-1 bg-[#181818]"><p id="dropName" class="font-bold text-sm truncate flex items-center gap-2 text-white"></p><p id="dropEmail" class="text-xs text-gray-400 truncate mt-1"></p></div>
+            <a href="javascript:void(0)" onclick="goToMyChannel()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-user-astronaut w-6 text-gray-400"></i> Kanalım</a>
+            <a href="javascript:void(0)" onclick="openSavedVideos()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-bookmark w-6 text-gray-400"></i> Kaydedilenler</a>
+            <a href="javascript:void(0)" onclick="openHistory()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-clock-rotate-left w-6 text-gray-400"></i> İzleme Geçmişi</a>
+            <a href="javascript:void(0)" onclick="openSettings()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-gear w-6 text-gray-400"></i> Ayarlar</a>
+            <div class="h-px bg-[#333] my-1"></div>
+            <a href="javascript:void(0)" onclick="logout()" class="block px-4 py-2.5 text-sm hover:bg-red-900/30 text-red-400 transition-colors"><i class="fa-solid fa-right-from-bracket w-6"></i> Çıkış Yap</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ziyaretçi -->
+      <div id="guestSection">
+        <button onclick="openModal('authModal')" class="flex items-center gap-2 bg-[#272727] theme-text hover:bg-[#333] px-5 py-2 rounded-full text-sm font-bold transition-colors">
+          <i class="fa-regular fa-user"></i> Giriş Yap
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANA İÇERİK -->
+  <main class="flex-1 overflow-y-auto w-full relative" id="mainScroll">
+    
+    <!-- 1. ANASAYFA -->
+    <div id="homeView" class="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-full">
+      <div id="categoryBar" class="flex gap-3 overflow-x-auto hide-scroll pb-2 mb-6 border-b border-[#272727]">
+        <button onclick="filterCat('Tümü')" class="cat-btn active bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap">Tümü</button>
+        <button onclick="filterCat('Trendler')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]"><i class="fa-solid fa-fire text-red-500 mr-1"></i> Trendler</button>
+        <button onclick="filterCat('Oyun')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Oyun</button>
+        <button onclick="filterCat('Müzik')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Müzik</button>
+        <button onclick="filterCat('Eğitim')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Eğitim</button>
+        <button onclick="filterCat('Yazılım')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Yazılım</button>
+        <button onclick="filterCat('Eğlence')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Eğlence</button>
+      </div>
+      <h2 id="homeTitle" class="text-2xl font-bold text-white mb-6 hidden border-b border-[#272727] pb-3"></h2>
+      <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8"></div>
+      <div id="emptyState" class="hidden flex flex-col items-center justify-center mt-32 text-gray-500">
+        <div class="w-24 h-24 bg-[#1f1f1f] rounded-full flex items-center justify-center mb-4 border border-[#333]"><i class="fa-solid fa-satellite-dish text-4xl"></i></div>
+        <h2 class="text-xl font-bold text-white mb-2">Henüz İçerik Yok</h2>
+      </div>
+    </div>
+
+    <!-- 2. SHORTS GÖRÜNÜMÜ -->
+    <div id="shortsView" class="hidden snap-container bg-black relative">
+      <div id="shortsContainer" class="max-w-[450px] mx-auto h-full relative border-x border-[#272727]"></div>
+      <!-- Ana ekrana dön -->
+      <button onclick="switchView('homeView')" class="fixed top-20 left-4 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center z-[60] hover:bg-black border border-white/20 shadow-lg">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- 3. VİDEO İZLEME GÖRÜNÜMÜ -->
+    <div id="watchView" class="hidden p-4 sm:p-6 max-w-[1600px] mx-auto transition-all duration-300">
+      <div class="flex flex-col lg:flex-row gap-6" id="watchLayout">
+        
+        <!-- SOL SÜTUN: VİDEO VE YORUMLAR -->
+        <div class="flex-1 lg:w-2/3 transition-all duration-300" id="videoPrimary">
+          <div class="bg-black rounded-2xl overflow-hidden aspect-video w-full shadow-2xl border border-[#272727] relative group" id="playerContainer">
+            <video id="player" controls autoplay class="w-full h-full object-contain"></video>
+            <div class="absolute bottom-16 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <button onclick="toggleSpeed()" id="speedBtn" class="bg-black/70 text-white px-3 py-1 rounded-lg text-xs font-bold border border-white/20 hover:bg-black transition-colors"><i class="fa-solid fa-gauge-high"></i> 1x</button>
+              <button onclick="toggleLoop()" id="loopBtn" class="bg-black/70 text-white px-3 py-1 rounded-lg text-xs font-bold border border-white/20 hover:bg-black transition-colors"><i class="fa-solid fa-repeat"></i> Kapalı</button>
+              <button onclick="toggleCinema()" class="bg-black/70 text-white px-3 py-1 rounded-lg text-xs font-bold border border-white/20 hover:bg-black hidden lg:block transition-colors"><i class="fa-solid fa-expand"></i> Sinema</button>
+              <button onclick="togglePiP()" class="bg-black/70 text-white px-3 py-1 rounded-lg text-xs font-bold border border-white/20 hover:bg-black transition-colors"><i class="fa-solid fa-down-left-and-up-right-to-center"></i> Mini</button>
+            </div>
+          </div>
+          
+          <h1 id="playerTitle" class="text-xl sm:text-2xl font-bold mt-4 mb-1 text-white"></h1>
+          <p class="text-sm text-gray-400 mb-3"><span id="playerViewsCount">0</span> Görüntülenme • <span id="playerDate"></span></p>
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272727]">
+            <div class="flex items-center gap-3 cursor-pointer group bg-[#121212] hover:bg-[#1f1f1f] p-2 rounded-xl transition-colors border border-transparent hover:border-[#333]" onclick="goToChannel(window.currentUploaderId)">
+              <img id="playerAvatar" src="" class="w-12 h-12 rounded-full object-cover border border-[#333] shadow-md">
+              <div><h3 id="playerChannelName" class="font-bold text-[16px] group-hover-theme-text transition-colors flex items-center gap-1 text-white"></h3><span id="playerSubCount" class="text-xs text-gray-400"></span></div>
+              <button id="subscribeBtn" onclick="event.stopPropagation(); toggleSubscribe()" class="ml-4 bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-bold border border-gray-300 transition-colors">Abone Ol</button>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+              <button id="likeBtn" onclick="toggleLike()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-regular fa-thumbs-up"></i> <span id="playerLikesCount">0</span></button>
+              <button onclick="shareVideo()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
+              <button id="saveBtn" onclick="toggleSave()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-regular fa-bookmark"></i> Kaydet</button>
+              <button id="editVidBtn" onclick="openEditModal()" class="hidden items-center gap-2 bg-[#272727] theme-text px-4 py-2 rounded-full text-sm font-bold transition-colors hover:bg-[#333]"><i class="fa-solid fa-pen-to-square"></i> Düzenle</button>
+              <button id="deleteVidBtn" onclick="deleteCurrentVideo()" class="hidden items-center gap-2 bg-red-900/30 text-red-400 hover:text-white hover:bg-red-600 px-4 py-2 rounded-full text-sm font-bold border border-red-500/30 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>
+            </div>
+          </div>
+          <div class="mt-4 bg-[#272727]/50 p-4 rounded-xl text-sm whitespace-pre-line text-gray-200"><p id="playerDescription"></p></div>
+
+          <!-- YORUMLAR (ANA VİDEO EKRANI) -->
+          <div class="mt-8">
+            <h3 class="font-bold text-lg mb-4 text-white" id="commentCountTitle">Yorumlar</h3>
+            <div class="flex gap-3 mb-6">
+              <img id="myCommentAvatar" src="" class="w-10 h-10 rounded-full object-cover border border-[#333]">
+              <div class="flex-1 flex flex-col items-end gap-2">
+                <textarea id="commentInput" placeholder="Düşüncelerini paylaş..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-sm transition-colors h-8 focus:h-16 text-white"></textarea>
+                <button onclick="postComment('watch')" class="theme-bg text-white px-5 py-2 rounded-full text-sm font-bold transition-colors">Yorum Yap</button>
+              </div>
+            </div>
+            <div id="commentsList" class="flex flex-col gap-6"></div>
+          </div>
+        </div>
+
+        <!-- SAĞ SÜTUN: ÖNERİLEN VİDEOLAR -->
+        <div class="w-full lg:w-[400px] xl:w-[450px] flex flex-col gap-3 transition-all duration-300">
+          <div id="recommendationGrid" class="flex flex-col gap-3"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. KANAL GÖRÜNÜMÜ -->
+    <div id="channelView" class="hidden min-h-full">
+      <div id="channelBanner" class="w-full h-32 sm:h-48 md:h-64 bg-[#1f1f1f] bg-cover bg-center border-b border-[#333]"></div>
+      <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 -mt-12 sm:-mt-16 mb-8 relative z-10">
+          <img id="cvAvatar" src="" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-[#0f0f0f] bg-[#1f1f1f] shadow-xl">
+          <div class="mt-2 sm:mt-16 flex-1 text-center sm:text-left"><h1 id="cvName" class="text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1><p id="cvStats" class="text-gray-400 text-sm mt-1"></p></div>
+          <div class="sm:mt-16"><button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-6 py-2.5 rounded-full font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button></div>
+        </div>
+        <div class="border-b border-[#272727] mb-6 flex gap-6">
+          <button id="tabVideosBtn" onclick="switchChannelTab('videos')" class="px-2 py-3 border-b-2 font-bold theme-text" style="border-color: var(--theme-main)">Videolar</button>
+          <button id="tabCommunityBtn" onclick="switchChannelTab('community')" class="px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors">Topluluk</button>
+        </div>
+        
+        <div id="cvVideoGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10"></div>
+        <div id="cvCommunityArea" class="hidden max-w-2xl mx-auto pb-10 flex flex-col gap-6">
+          <div id="createPostBox" class="hidden bg-[#181818] border border-[#272727] p-4 rounded-2xl flex flex-col gap-3">
+            <h4 class="font-bold text-sm text-white"><i class="fa-solid fa-bullhorn theme-text mr-2"></i>Topluluk Gönderisi Paylaş</h4>
+            <textarea id="postContentInput" placeholder="Abonelerinle bir duyuru, düşünce veya soru paylaş..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none resize-none h-24 theme-border text-white"></textarea>
+            <div class="flex justify-end"><button onclick="publishCommunityPost()" class="theme-bg text-white px-5 py-2 rounded-full text-sm font-bold transition-transform hover:scale-105">Paylaş</button></div>
+          </div>
+          <div id="communityPostsList" class="flex flex-col gap-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. AYARLAR GÖRÜNÜMÜ -->
+    <div id="settingsView" class="hidden max-w-3xl mx-auto p-6 min-h-full">
+      <h2 class="text-2xl font-bold mb-6 border-b border-[#272727] pb-4 text-white"><i class="fa-solid fa-gear theme-text mr-2"></i> Ayarlar & Özelleştirme</h2>
+      <div class="bg-[#181818] border border-[#272727] p-6 sm:p-8 rounded-2xl flex flex-col gap-8 shadow-xl">
+        <div class="border-b border-[#333] pb-6">
+          <h3 class="font-bold text-lg mb-4 text-white">Vurgu Rengi</h3>
+          <div class="flex gap-4 mb-6">
+            <button onclick="changeColor('blue')" class="w-10 h-10 rounded-full bg-blue-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('green')" class="w-10 h-10 rounded-full bg-green-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('yellow')" class="w-10 h-10 rounded-full bg-yellow-500 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('red')" class="w-10 h-10 rounded-full bg-red-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('purple')" class="w-10 h-10 rounded-full bg-purple-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+          </div>
+          <h3 class="font-bold text-lg mb-4 text-white">Uygulama Görünümü</h3>
+          <div class="flex gap-4">
+            <button onclick="setTheme(false)" class="flex-1 bg-[#121212] border border-[#333] theme-border p-4 rounded-xl flex flex-col items-center gap-2 text-gray-300 transition-colors"><i class="fa-solid fa-moon text-2xl"></i><span class="font-bold">Karanlık</span></button>
+            <button onclick="setTheme(true)" class="flex-1 bg-[#f9fafb] border border-gray-300 theme-border p-4 rounded-xl flex flex-col items-center gap-2 text-gray-800 transition-colors"><i class="fa-solid fa-sun text-2xl"></i><span class="font-bold">Aydınlık</span></button>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg mb-2 text-white">Profil Fotoğrafı</h3>
+          <div class="flex items-center gap-6 mt-4"><img id="setAvatarPreview" src="" class="w-24 h-24 rounded-full object-cover border-2 border-[#333]"><input type="file" id="setAvatarFile" accept="image/*" class="text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
+        </div>
+        <div class="border-t border-[#333] pt-6">
+          <h3 class="font-bold text-lg mb-4 text-white">Kanal Arka Planı (Banner)</h3>
+          <div class="flex flex-col gap-4"><div id="setBannerPreview" class="w-full h-32 bg-[#121212] rounded-xl bg-cover bg-center border-2 border-[#333] shadow-inner"></div><input type="file" id="setBannerFile" accept="image/*" class="text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
+        </div>
+        <div id="settingsProgress" class="hidden theme-progress p-4 rounded-xl text-sm flex items-center gap-3"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Kaydediliyor...</div>
+        <button onclick="saveSettings()" id="settingsSaveBtn" class="theme-bg text-white font-bold py-3.5 rounded-xl mt-2 theme-shadow transition-colors">Değişiklikleri Kaydet</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================= -->
+  <!-- MODALLAR                                  -->
+  <!-- ========================================= -->
+  
+  <!-- SHORTS YORUM MODALI (TİKTOK STİLİ) -->
+  <div id="shortsCommentModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-[#212121] sm:border border-[#333] w-full sm:max-w-lg h-[75vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform">
+      <div class="flex justify-between items-center p-4 border-b border-[#333] shrink-0">
+        <h3 class="font-bold text-white" id="shortsCommentCountTitle">Yorumlar</h3>
+        <button onclick="closeModal('shortsCommentModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div id="shortsCommentList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-6 hide-scroll"></div>
+      <div class="p-4 border-t border-[#333] bg-[#181818] shrink-0 flex items-end gap-3 sm:rounded-b-3xl">
+         <img id="shortsMyCommentAvatar" src="" class="w-9 h-9 rounded-full object-cover border border-[#333]">
+         <textarea id="shortsCommentInput" placeholder="Yorum ekle..." class="flex-1 bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-2 text-sm text-white h-10 focus:h-16 transition-all"></textarea>
+         <button onclick="postComment('shorts')" class="theme-text font-bold text-sm px-2 py-2">Gönder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="glass p-8 rounded-3xl w-full max-w-sm relative shadow-2xl overflow-hidden">
+      <button onclick="closeModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      <div class="flex flex-col items-center mb-6"><div class="w-12 h-12 theme-bg rounded-xl flex items-center justify-center mb-3 shadow-lg"><i class="fa-solid fa-play text-white text-xl"></i></div><h3 id="authTitle" class="text-2xl font-bold text-white">Hoş Geldin</h3><p id="authSubtitle" class="text-xs text-gray-400 mt-1">Devam etmek için giriş yap</p></div>
+      <div class="flex flex-col gap-4 relative z-10">
+        <input type="email" id="authEmail" placeholder="E-posta" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3.5 text-sm outline-none text-white transition-colors">
+        <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3.5 text-sm outline-none text-white transition-colors">
+        <button onclick="handleAuth()" id="authBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-2 transition-colors shadow-lg">Giriş Yap</button>
+        <p class="text-sm text-gray-400 text-center mt-2 cursor-pointer transition-colors" onclick="toggleForgotPassword()" id="forgotPassText">Şifreni mi unuttun? <span class="theme-text font-bold">Sıfırla</span></p>
+        <p class="text-sm text-gray-400 text-center mt-1 cursor-pointer transition-colors" onclick="toggleAuthMode()" id="toggleAuthText">Hesabın yok mu? <span class="theme-text font-bold">Kayıt ol</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KANAL OLUŞTUR MODAL -->
+  <div id="channelModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#212121] border border-[#333] p-8 rounded-3xl w-full max-w-md relative">
+      <button onclick="closeModal('channelModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      <div class="text-center mb-6"><div class="w-16 h-16 bg-[#121212] rounded-full mx-auto flex items-center justify-center border border-[#333] mb-3"><i class="fa-solid fa-user-astronaut text-2xl theme-text"></i></div><h3 class="text-xl font-bold text-white">Kanalını Oluştur</h3><p class="text-sm text-gray-400 mt-1">Platforma katılmak için bir isim belirle.</p></div>
+      <div class="flex flex-col gap-4">
+        <input type="text" id="channelNameInput" placeholder="Örn: Oyun Günlüğüm" class="bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
+        <button onclick="createChannel()" class="theme-bg text-white font-bold py-3.5 rounded-xl text-sm transition-colors">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VİDEO YÜKLE MODAL -->
+  <div id="uploadModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('uploadModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-xl font-bold mb-6 text-white"><i class="fa-solid fa-cloud-arrow-up theme-text"></i> Video Yükle</h3>
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex-1 flex flex-col gap-4">
+          <input type="text" id="upTitle" placeholder="Başlık *" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
+          <textarea id="upDesc" placeholder="Açıklama..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none h-20 resize-none theme-border text-white"></textarea>
+          <select id="upCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none theme-border text-white cursor-pointer">
+            <option value="Oyun">Oyun</option><option value="Müzik">Müzik</option><option value="Eğitim">Eğitim</option><option value="Yazılım">Yazılım</option><option value="Eğlence">Eğlence</option>
+          </select>
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Video (.mp4) *</label><input type="file" id="upFile" accept="video/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Kapak (Thumbnail)</label><input type="file" id="upThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+        </div>
+        <div class="w-full lg:w-64 flex flex-col gap-4">
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Önizleme</label><div id="videoPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Kapak</label><div id="thumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+        </div>
+      </div>
+      <div id="uploadProgress" class="hidden theme-progress p-3 rounded-xl text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Yükleniyor...</div>
+      <button onclick="uploadVideo()" id="uploadBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-4 transition-colors shadow-lg">Yayınla</button>
+    </div>
+  </div>
+
+  <!-- VİDEO DÜZENLE MODAL -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('editModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-xl font-bold mb-6 text-white"><i class="fa-solid fa-pen-to-square theme-text"></i> Düzenle</h3>
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex-1 flex flex-col gap-4">
+          <input type="text" id="editTitle" placeholder="Başlık" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
+          <textarea id="editDesc" placeholder="Açıklama" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none h-24 resize-none theme-border text-white"></textarea>
+          <select id="editCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none theme-border text-white cursor-pointer">
+            <option value="Oyun">Oyun</option><option value="Müzik">Müzik</option><option value="Eğitim">Eğitim</option><option value="Yazılım">Yazılım</option><option value="Eğlence">Eğlence</option>
+          </select>
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Yeni Kapak Fotoğrafı (Opsiyonel)</label><input type="file" id="editThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+        </div>
+        <div class="w-full lg:w-64 flex flex-col gap-4">
+          <div><label class="text-xs font-bold text-gray-400 block mb-1">Mevcut / Yeni Kapak Önizlemesi</label><div id="editThumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-32 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+        </div>
+      </div>
+      <div id="editProgress" class="hidden theme-progress p-3 rounded-xl text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Güncelleniyor...</div>
+      <button onclick="saveVideoEdit()" id="editSaveBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-4 transition-colors shadow-lg">Kaydet</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-6 right-6 bg-[#212121] border border-[#333] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[60]">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
+    <span id="toastMsg" class="font-bold text-sm"></span>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- JAVASCRIPT & FIREBASE / SUPABASE          -->
+  <!-- ========================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, increment, onSnapshot, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const ADMIN_EMAILS = ["prokara.1236167@gmail.com"]; 
+    const _0x1c = atob("QUl6YVN5QVlYMWx6WngweGZqWVg0ZUppY0JJTVJIWURrRW11ODdB"); 
+    const _0x1d = atob("dHVya2thbmFsLWRhNWIwLmZpcmViYXNlYXBwLmNvbQ=="); 
+    const _0x1e = atob("dHVya2thbmFsLWRhNWIw"); 
+    const _0x1f = atob("dHVya2thbmFsLWRhNWIwLmZpcmViYXNlc3RvcmFnZS5hcHA="); 
+    const _0x2a = atob("MzgwODkyMTI3NTE1"); 
+    const _0x2b = atob("MTozODA4OTIxMjc1MTU6d2ViOmI1NzJhNWM5ZWFhZTY1MTA1MGYzYmU="); 
+    const firebaseConfig = { apiKey: _0x1c, authDomain: _0x1d, projectId: _0x1e, storageBucket: _0x1f, messagingSenderId: _0x2a, appId: _0x2b };
+    
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
+
+    const SUPABASE_URL = "https://exwshvhplfuaioaxhmkq.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_HlVKo4djtQiDqtwIHMmrfg_Vv5wUwqW";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null; 
+    let myChannelData = null; 
+    let isRegisterMode = false; 
+    let isForgotMode = false; 
+    let allVideos = []; 
+    window.currentVideoId = null; 
+    window.currentUploaderId = null; 
+    let currentVideoData = null; 
+    let currentChannelViewId = null;
+    let viewedVideos = new Set(); 
+
+    const isAdmin = () => currentUser && ADMIN_EMAILS.includes(currentUser.email);
+    const getAv = (d) => d?.avatarUrl || `https://via.placeholder.com/150/1f1f1f/ffffff?text=${(d?.channelName || 'U').charAt(0).toUpperCase()}`;
+    const getBn = (d) => d?.bannerUrl || `https://via.placeholder.com/1200x300/121212/333333?text=VidWave+Kanal`;
+    const getTh = (v) => v.thumbnailUrl || `https://via.placeholder.com/640x360/1f1f1f/555555?text=VidWave`;
+    const getBdge = (e) => ADMIN_EMAILS.includes(e) ? `<i class="fa-solid fa-circle-check theme-text text-xs ml-1" title="Kurucu / Mod"></i>` : "";
+
+    let toastTimeout; 
+    window.showToast = (msg, type = "success") => {
+      const tc = document.getElementById("toastContainer"); const ic = document.getElementById("toastIcon"); 
+      tc.querySelector('span').textContent = msg;
+      if(type === "success") { ic.className = "fa-solid fa-circle-check text-green-400 text-lg"; tc.style.borderColor = "#4ade8055"; } 
+      else { ic.className = "fa-solid fa-circle-exclamation text-red-400 text-lg"; tc.style.borderColor = "#f8717155"; }
+      tc.classList.add("show"); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => tc.classList.remove("show"), 3000);
+    };
+
+    document.body.setAttribute('data-color', localStorage.getItem('vw_color') || 'blue');
+    if(localStorage.getItem('vw_theme') === 'light') { document.body.classList.add("light-mode"); document.getElementById("themeIcon").className = "fa-solid fa-moon"; }
+    window.changeColor = (color) => { document.body.setAttribute('data-color', color); localStorage.setItem('vw_color', color); showToast("Tema rengi değiştirildi!"); };
+    window.toggleTheme = () => setTheme(!document.body.classList.contains("light-mode"));
+    window.setTheme = (isLight) => { 
+        document.body.classList.toggle("light-mode", isLight); document.getElementById("themeIcon").className = isLight ? "fa-solid fa-moon" : "fa-solid fa-sun"; 
+        localStorage.setItem('vw_theme', isLight ? 'light' : 'dark'); showToast("Görünüm değiştirildi!"); 
+    };
+
+    const addPreviewListener = (inputId, previewId, isVideo = false) => {
+      const inputEl = document.getElementById(inputId);
+      if(inputEl) { inputEl.addEventListener('change', (e) => { 
+          if(e.target.files[0]) {
+              const url = URL.createObjectURL(e.target.files[0]);
+              document.getElementById(previewId).innerHTML = isVideo ? `<video src="${url}" class="w-full h-full object-cover" muted autoplay loop></video>` : `<img src="${url}" class="w-full h-full object-cover">`; 
+          }
+      }); }
+    };
+    addPreviewListener('setAvatarFile', 'setAvatarPreview'); addPreviewListener('setBannerFile', 'setBannerPreview'); addPreviewListener('upThumb', 'thumbPreviewArea'); addPreviewListener('editThumb', 'editThumbPreviewArea'); addPreviewListener('upFile', 'videoPreviewArea', true);
+
+    let currentSpeed = 1;
+    window.toggleSpeed = () => { currentSpeed = currentSpeed === 1 ? 1.5 : (currentSpeed === 1.5 ? 2 : 1); document.getElementById("player").playbackRate = currentSpeed; document.getElementById("speedBtn").innerHTML = `<i class="fa-solid fa-gauge-high"></i> ${currentSpeed}x`; showToast(`Video hızı ${currentSpeed}x yapıldı`); };
+    window.toggleLoop = () => { const player = document.getElementById("player"); const loopBtn = document.getElementById("loopBtn"); player.loop = !player.loop; if(player.loop) { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Açık`; loopBtn.classList.add("theme-text"); showToast("Döngü açıldı"); } else { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Kapalı`; loopBtn.classList.remove("theme-text"); showToast("Döngü kapatıldı"); } };
+    window.toggleCinema = () => { const primary = document.getElementById("videoPrimary"); const layout = document.getElementById("watchLayout"); primary.classList.toggle("lg:w-2/3"); primary.classList.toggle("w-full"); layout.classList.toggle("flex-col"); showToast("Sinema Modu değiştirildi"); };
+    window.togglePiP = async () => { try { if(document.pictureInPictureElement) await document.exitPictureInPicture(); else await document.getElementById('player').requestPictureInPicture(); } catch(e){ showToast("Mini oynatıcı bu tarayıcıda desteklenmiyor", "error"); } };
+    window.shareVideo = () => { navigator.clipboard.writeText(`https://vidwave.app/watch?v=${window.currentVideoId}`); showToast("Video linki kopyalandı!"); };
+
+    let shortsObserver = null;
+    window.setupShortsObserver = () => {
+      if (shortsObserver) shortsObserver.disconnect();
+      const shortsVideos = document.querySelectorAll('.snap-item video');
+      shortsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            shortsVideos.forEach(v => { if(v !== video) v.pause(); });
+            video.play().catch(e => console.log("Otomatik oynatma engellendi: ", e));
+          } else { video.pause(); }
+        });
+      }, { threshold: 0.6 });
+      shortsVideos.forEach(v => shortsObserver.observe(v));
+    };
+
+    window.switchView = (viewId, title = "") => {
+      ['homeView', 'watchView', 'channelView', 'settingsView', 'shortsView'].forEach(v => { document.getElementById(v).classList.add('hidden'); });
+      document.getElementById(viewId).classList.remove('hidden'); 
+      if(viewId !== 'watchView') document.getElementById('player').pause();
+      if(viewId !== 'shortsView') document.querySelectorAll('.snap-item video').forEach(v => v.pause());
+      
+      const homeTitleEl = document.getElementById("homeTitle"); 
+      if(viewId === 'homeView' && title) { homeTitleEl.innerHTML = title; homeTitleEl.classList.remove("hidden"); } else { homeTitleEl.classList.add("hidden"); }
+      if(viewId === 'shortsView') renderShorts(); 
+      window.scrollTo(0,0);
+    };
+
+    window.openModal = (id) => document.getElementById(id).classList.remove('hidden'); 
+    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+    window.toggleDropdown = () => document.getElementById('userDropdown').classList.toggle('hidden');
+    window.toggleNotifs = () => { document.getElementById('notifDropdown').classList.toggle('hidden'); document.getElementById('notifBadge').classList.add('hidden'); };
+    window.addEventListener('click', (e) => { 
+      if (!document.getElementById('navAvatar').contains(e.target)) document.getElementById('userDropdown').classList.add('hidden'); 
+      const notifCont = document.getElementById('notifContainer');
+      if (notifCont && !notifCont.contains(e.target)) document.getElementById('notifDropdown').classList.add('hidden'); 
+    });
+
+    async function uploadToSupabase(file) {
+      if (!file) return null;
+      const fileExt = file.name.split('.').pop(); const fileName = `uploads/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('media').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (error) { throw new Error("Yükleme başarısız oldu: " + error.message); }
+      const { data: publicData } = supabase.storage.from('media').getPublicUrl(fileName); return publicData.publicUrl;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        document.getElementById("userSection").classList.remove("hidden"); document.getElementById("guestSection").classList.add("hidden");
+        const modHtml = isAdmin() ? " <span class='theme-text font-bold'>(Kurucu)</span>" : "";
+        document.getElementById("dropEmail").innerHTML = user.email + modHtml;
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (docSnap.exists()) {
+          myChannelData = docSnap.data(); myChannelData.email = user.email;
+          document.getElementById("createChannelBtn").classList.add("hidden"); document.getElementById("uploadVideoBtn").classList.remove("hidden"); 
+          const avatarUrl = getAv(myChannelData); 
+          document.getElementById("navAvatar").src = avatarUrl; document.getElementById("myCommentAvatar").src = avatarUrl; document.getElementById("setAvatarPreview").src = avatarUrl;
+          document.getElementById("setBannerPreview").style.backgroundImage = `url(${getBn(myChannelData)})`; document.getElementById("dropName").innerHTML = myChannelData.channelName + getBdge(user.email);
+          renderNotifs(myChannelData.notifications || []);
+        } else { myChannelData = null; document.getElementById("createChannelBtn").classList.remove("hidden"); document.getElementById("uploadVideoBtn").classList.add("hidden"); }
+      } else { document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; }
+    });
+
+    function renderNotifs(notifs) {
+      const list = document.getElementById("notifList"); const badge = document.getElementById("notifBadge"); list.innerHTML = ""; 
+      const unreadCount = notifs.filter(n => !n.isRead).length;
+      if(unreadCount > 0) badge.classList.remove("hidden"); else badge.classList.add("hidden");
+      if(notifs.length === 0) { list.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Bildirim yok</p>`; return; }
+      notifs.reverse().slice(0, 10).forEach(n => { list.innerHTML += `<div class="p-3 border-b border-[#333] hover:bg-[#333] cursor-pointer ${n.isRead ? 'opacity-70' : ''}" onclick="markReadAndGo('${n.link}')"><p class="text-sm text-gray-200">${n.msg}</p><span class="text-xs text-gray-500">${new Date(n.time).toLocaleDateString()}</span></div>`; });
+    }
+    
+    async function sendNotif(targetUid, msg, link) { if(!currentUser || targetUid === currentUser.uid) return; await updateDoc(doc(db, "users", targetUid), { notifications: arrayUnion({msg, link, time: Date.now(), isRead: false}) }); }
+    window.clearNotifs = async () => { if(currentUser) { await updateDoc(doc(db, "users", currentUser.uid), { notifications: [] }); renderNotifs([]); } };
+    window.markReadAndGo = async (link) => {
+      if(currentUser && myChannelData) {
+        const markedNotifs = (myChannelData.notifications || []).map(n => ({...n, isRead: true}));
+        await updateDoc(doc(db, "users", currentUser.uid), { notifications: markedNotifs }); myChannelData.notifications = markedNotifs; renderNotifs(markedNotifs);
+      }
+      if(link.startsWith('v_')) { const vidId = link.split('_')[1]; const video = allVideos.find(x => x.id === vidId); if(video) playVideo(vidId, video); }
+    };
+
+    window.toggleForgotPassword = () => {
+      isForgotMode = !isForgotMode;
+      if(isForgotMode) { document.getElementById("authTitle").textContent = "Şifre Sıfırlama"; document.getElementById("authSubtitle").textContent = "E-posta adresinize bir link göndereceğiz."; document.getElementById("authPass").classList.add("hidden"); document.getElementById("authBtn").textContent = "Sıfırlama Linki Gönder"; document.getElementById("toggleAuthText").classList.add("hidden"); document.getElementById("forgotPassText").innerHTML = "Giriş ekranına <span class='theme-text font-bold'>Geri Dön</span>"; } 
+      else { isRegisterMode = false; document.getElementById("authTitle").textContent = "Hoş Geldin"; document.getElementById("authSubtitle").textContent = "Devam etmek için giriş yap"; document.getElementById("authPass").classList.remove("hidden"); document.getElementById("authBtn").textContent = "Giriş Yap"; document.getElementById("toggleAuthText").classList.remove("hidden"); document.getElementById("forgotPassText").innerHTML = "Şifreni mi unuttun? <span class='theme-text font-bold'>Sıfırla</span>"; }
+    };
+
+    window.toggleAuthMode = () => { 
+        if(isForgotMode) return; 
+        isRegisterMode = !isRegisterMode; document.getElementById("authTitle").textContent = isRegisterMode ? "Kayıt Ol" : "Hoş Geldin"; document.getElementById("authBtn").textContent = isRegisterMode ? "Hesap Oluştur" : "Giriş Yap"; 
+        if(isRegisterMode) document.getElementById("forgotPassText").classList.add("hidden"); else document.getElementById("forgotPassText").classList.remove("hidden");
+        document.getElementById("toggleAuthText").innerHTML = isRegisterMode ? "Zaten hesabın var mı? <span class='theme-text font-bold'>Giriş yap</span>" : "Hesabın yok mu? <span class='theme-text font-bold'>Kayıt ol</span>"; 
+    };
+    
+    window.handleAuth = async () => { 
+        const email = document.getElementById("authEmail").value; const pass = document.getElementById("authPass").value; 
+        if(isForgotMode) { if(!email) return showToast("Lütfen e-posta adresinizi girin!", "error"); try { await sendPasswordResetEmail(auth, email); showToast("Şifre sıfırlama linki e-postanıza gönderildi!"); toggleForgotPassword(); } catch(err) { showToast("Hata: Hesap bulunamadı veya geçersiz.", "error"); } return; }
+        if(!email || !pass) return showToast("Lütfen tüm alanları doldurun.", "error"); 
+        try { if(isRegisterMode) { await createUserWithEmailAndPassword(auth, email, pass); showToast("Kayıt başarılı! Şimdi kanalını oluştur."); } else { await signInWithEmailAndPassword(auth, email, pass); showToast("Başarıyla giriş yapıldı."); } closeModal("authModal"); } 
+        catch (error) { showToast("Hata: " + error.message, "error"); } 
+    };
+    
+    window.logout = () => { signOut(auth); showToast("Çıkış yapıldı"); };
+    
+    window.createChannel = async () => { 
+        if(!currentUser) return; const channelName = document.getElementById("channelNameInput").value; if(channelName.length < 3) return showToast("Kanal adı en az 3 karakter olmalıdır.", "error"); 
+        try { await setDoc(doc(db, "users", currentUser.uid), { channelName: channelName, email: currentUser.email, subscribers: [], savedVideos: [], history: [], notifications: [], createdAt: Date.now() }); closeModal("channelModal"); window.location.reload(); } catch (error) { showToast("Hata oluştu!", "error"); } 
+    };
+    
+    window.openSettings = () => switchView('settingsView'); 
+    window.goToMyChannel = () => { if(currentUser && myChannelData) goToChannel(currentUser.uid); };
+    window.openSavedVideos = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-bookmark theme-text mr-2"></i> Kaydedilen Videolar'); const savedList = myChannelData.savedVideos || []; renderVideoGrid(allVideos.filter(v => savedList.includes(v.id))); };
+    window.openHistory = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-clock-rotate-left theme-text mr-2"></i> İzleme Geçmişi'); const historyList = myChannelData.history || []; const filteredVideos = allVideos.filter(v => historyList.includes(v.id)); filteredVideos.sort((a, b) => historyList.indexOf(b.id) - historyList.indexOf(a.id)); renderVideoGrid(filteredVideos); };
+
+    window.saveSettings = async () => {
+      if(!currentUser) return; 
+      const avatarFile = document.getElementById("setAvatarFile").files[0]; const bannerFile = document.getElementById("setBannerFile").files[0]; 
+      if(!avatarFile && !bannerFile) return showToast("Lütfen yüklenecek bir dosya seçin.", "error");
+      document.getElementById("settingsProgress").classList.remove("hidden"); 
+      try { let updates = {}; if(avatarFile) updates.avatarUrl = await uploadToSupabase(avatarFile); if(bannerFile) updates.bannerUrl = await uploadToSupabase(bannerFile); await updateDoc(doc(db, "users", currentUser.uid), updates); showToast("Ayarlar başarıyla güncellendi!"); setTimeout(() => window.location.reload(), 1000); } 
+      catch (error) { showToast("Hata: " + error.message, "error"); } finally { document.getElementById("settingsProgress").classList.add("hidden"); }
+    };
+
+    window.uploadVideo = async () => {
+      if (!myChannelData) return showToast("Önce bir kanal oluşturmalısın!", "error"); 
+      const title = document.getElementById("upTitle").value; const desc = document.getElementById("upDesc").value; const category = document.getElementById("upCategory").value; 
+      const videoFile = document.getElementById("upFile").files[0]; const thumbFile = document.getElementById("upThumb").files[0];
+      if (!title || !videoFile) return showToast("Başlık ve Video dosyası zorunludur!", "error"); 
+      document.getElementById("uploadProgress").classList.remove("hidden"); document.getElementById("uploadBtn").disabled = true;
+      try { 
+        const videoUrl = await uploadToSupabase(videoFile); let thumbnailUrl = null; if(thumbFile) thumbnailUrl = await uploadToSupabase(thumbFile);
+        await addDoc(collection(db, "videos"), { title: title, description: desc, category: category, videoUrl: videoUrl, thumbnailUrl: thumbnailUrl, uploaderId: currentUser.uid, channelName: myChannelData.channelName, uploaderEmail: currentUser.email, likes: 0, likedBy: [], views: 0, createdAt: Date.now() }); 
+        showToast("Videon başarıyla yüklendi!"); window.location.reload();
+      } catch(error) { showToast("Yükleme sırasında hata: " + error.message, "error"); } finally { document.getElementById("uploadProgress").classList.add("hidden"); document.getElementById("uploadBtn").disabled = false; }
+    };
+
+    window.openEditModal = () => { document.getElementById("editTitle").value = currentVideoData.title; document.getElementById("editDesc").value = currentVideoData.description || ""; document.getElementById("editCategory").value = currentVideoData.category || "Oyun"; document.getElementById("editThumbPreviewArea").innerHTML = `<img src="${getTh(currentVideoData)}" class="w-full h-full object-cover">`; openModal("editModal"); };
+
+    window.saveVideoEdit = async () => {
+      const newTitle = document.getElementById("editTitle").value; const newDesc = document.getElementById("editDesc").value; const newCategory = document.getElementById("editCategory").value; const thumbFile = document.getElementById("editThumb").files[0];
+      if(!newTitle) return showToast("Başlık boş bırakılamaz", "error");
+      document.getElementById("editProgress").classList.remove("hidden"); document.getElementById("editSaveBtn").disabled = true;
+      try { 
+        let updates = { title: newTitle, description: newDesc, category: newCategory }; if(thumbFile) updates.thumbnailUrl = await uploadToSupabase(thumbFile);
+        await updateDoc(doc(db, "videos", window.currentVideoId), updates); 
+        currentVideoData.title = newTitle; currentVideoData.description = newDesc; currentVideoData.category = newCategory; if(updates.thumbnailUrl) currentVideoData.thumbnailUrl = updates.thumbnailUrl;
+        document.getElementById("playerTitle").textContent = newTitle; document.getElementById("playerDescription").textContent = newDesc; 
+        showToast("Video bilgileri güncellendi!"); closeModal("editModal"); 
+      } catch(error) { showToast("Düzenleme hatası: " + error.message, "error"); } finally { document.getElementById("editProgress").classList.add("hidden"); document.getElementById("editSaveBtn").disabled = false; }
+    };
+    
+    window.deleteVideo = async (id) => { if(confirm("Bu videoyu platformdan kalıcı olarak silmek istediğinize emin misiniz?")) { await deleteDoc(doc(db, "videos", id)); showToast("Video silindi"); if(!document.getElementById('watchView').classList.contains('hidden')) switchView('homeView'); } };
+    window.deleteCurrentVideo = () => deleteVideo(window.currentVideoId);
+
+    let currentCategoryFilter = "Tümü";
+    window.filterCat = (catName) => {
+      currentCategoryFilter = catName; 
+      document.querySelectorAll('.cat-btn').forEach(btn => { 
+          btn.className = "cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]"; 
+          if(btn.textContent.includes(catName)) { btn.className = "cat-btn active bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap"; }
+      });
+      if(catName === "Trendler") { const trendingVideos = [...allVideos].sort((a,b) => (b.views || 0) - (a.views || 0)); renderVideoGrid(trendingVideos); } 
+      else if(catName === "Tümü") { renderVideoGrid(allVideos); } 
+      else { const filtered = allVideos.filter(v => v.category === catName); renderVideoGrid(filtered); }
+    };
+    
+    document.getElementById("searchInput").addEventListener("input", (e) => { 
+        const searchTerm = e.target.value.toLowerCase(); 
+        if(document.getElementById('homeView').classList.contains('hidden')) switchView('homeView'); 
+        const searchResults = allVideos.filter(v => v.title.toLowerCase().includes(searchTerm) || v.channelName.toLowerCase().includes(searchTerm)); renderVideoGrid(searchResults); 
+    });
+
+    onSnapshot(query(collection(db, "videos"), orderBy("createdAt", "desc")), async (snapshot) => {
+      allVideos = []; snapshot.forEach(docSnap => allVideos.push({ id: docSnap.id, ...docSnap.data() }));
+      if(!document.getElementById('homeView').classList.contains('hidden') && document.getElementById("homeTitle").classList.contains("hidden")) { filterCat(currentCategoryFilter); }
+      if(!document.getElementById('channelView').classList.contains('hidden') && currentChannelViewId) { renderChannelVideos(currentChannelViewId); }
+    });
+
+    async function renderVideoGrid(videosArray) {
+      const grid = document.getElementById("videoGrid"); grid.innerHTML = ""; 
+      if(videosArray.length === 0) { document.getElementById("emptyState").classList.remove("hidden"); return; }
+      document.getElementById("emptyState").classList.add("hidden");
+      
+      const uniqueUploaderIds = [...new Set(videosArray.map(v => v.uploaderId))];
+      const userDocsCache = {}; 
+      for(let uid of uniqueUploaderIds) { const snap = await getDoc(doc(db, "users", uid)); if(snap.exists()) userDocsCache[uid] = snap.data(); }
+
+      videosArray.forEach(video => {
+        const uploaderData = userDocsCache[video.uploaderId]; 
+        const canDelete = currentUser && (currentUser.uid === video.uploaderId || isAdmin());
+        const card = document.createElement("div"); card.className = "cursor-pointer group flex flex-col gap-3 relative";
+        
+        card.innerHTML = `
+          ${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${video.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg flex items-center justify-center"><i class="fa-solid fa-trash text-sm"></i></button>` : ""}
+          <div class="aspect-video bg-[#181818] rounded-2xl overflow-hidden relative border border-[#272727] group-hover:border-gray-500 transition-all shadow-md"><img src="${getTh(video)}" class="w-full h-full object-cover"></div>
+          <div class="flex gap-3 px-1">
+            <img src="${getAv(uploaderData)}" class="w-10 h-10 rounded-full object-cover border border-[#333] hover:opacity-80" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">
+            <div class="flex-1">
+              <h4 class="font-bold text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${video.title}</h4>
+              <p class="text-[13px] text-gray-400 mt-1 hover:text-white" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">${video.channelName} ${getBdge(video.uploaderEmail)}</p>
+              <p class="text-xs text-gray-500">${video.views || 0} Görüntülenme • ${video.likedBy?.length || 0} Beğeni</p>
+            </div>
+          </div>`;
+        card.onclick = () => playVideo(video.id, video, userDocsCache); grid.appendChild(card);
+      });
+    }
+
+    async function renderShorts() {
+      const container = document.getElementById("shortsContainer"); 
+      container.innerHTML = `<div class="flex items-center justify-center h-full w-full"><i class="fa-solid fa-spinner fa-spin text-white text-3xl"></i></div>`;
+      
+      const shortsList = allVideos.slice(0, 15);
+      const uniqueUids = [...new Set(shortsList.map(v => v.uploaderId))];
+      const userCache = {};
+      for(let uid of uniqueUids) { const snap = await getDoc(doc(db, "users", uid)); if(snap.exists()) userCache[uid] = snap.data(); }
+
+      container.innerHTML = "";
+      
+      shortsList.forEach(video => {
+        const uData = userCache[video.uploaderId];
+        const isLiked = currentUser && (video.likedBy || []).includes(currentUser.uid);
+        const likesCount = (video.likedBy || []).length;
+        const isSaved = myChannelData && (myChannelData.savedVideos || []).includes(video.id);
+
+        container.innerHTML += `
+          <div class="snap-item w-full bg-black relative flex justify-center border-b border-[#333] overflow-hidden">
+            <video src="${video.videoUrl}" class="w-full h-full object-cover cursor-pointer" loop onclick="this.paused ? this.play() : this.pause()"></video>
+            <div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none"></div>
+            <div class="absolute bottom-6 left-4 right-16 text-white z-10 flex flex-col gap-2">
+              <div class="flex items-center gap-3 cursor-pointer" onclick="goToChannel('${video.uploaderId}')">
+                <img src="${getAv(uData)}" class="w-9 h-9 rounded-full object-cover border border-white/30 shadow-md">
+                <span class="font-bold text-sm drop-shadow-md">@${video.channelName}</span>
+              </div>
+              <h3 class="font-semibold text-sm drop-shadow-md line-clamp-2">${video.title}</h3>
+            </div>
+            
+            <div class="absolute bottom-6 right-4 flex flex-col gap-6 items-center z-10">
+              <button onclick="toggleShortLike('${video.id}')" class="flex flex-col items-center gap-1 group">
+                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i id="shortLikeIcon_${video.id}" class="${isLiked ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-2xl transition-colors"></i>
+                </div>
+                <span class="text-xs text-white font-bold drop-shadow-md" id="shortLikeCount_${video.id}">${likesCount}</span>
+              </button>
+              <button onclick="openShortsComments('${video.id}', '${video.uploaderId}')" class="flex flex-col items-center gap-1 group">
+                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i class="fa-solid fa-comment-dots text-white text-2xl"></i>
+                </div>
+                <span class="text-xs text-white font-bold drop-shadow-md">Yorum</span>
+              </button>
+              <button onclick="toggleShortSave('${video.id}')" class="flex flex-col items-center gap-1 group">
+                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i id="shortSaveIcon_${video.id}" class="${isSaved ? 'fa-solid theme-text' : 'fa-regular text-white'} fa-bookmark text-2xl transition-colors"></i>
+                </div>
+                <span class="text-xs text-white font-bold drop-shadow-md">Kaydet</span>
+              </button>
+              <button onclick="shareShort('${video.id}')" class="flex flex-col items-center gap-1 group">
+                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i class="fa-solid fa-share text-white text-2xl"></i>
+                </div>
+                <span class="text-xs text-white font-bold drop-shadow-md">Paylaş</span>
+              </button>
+            </div>
+          </div>`;
+      });
+      setTimeout(() => setupShortsObserver(), 100);
+    }
+
+    let commentUnsubListener = null;
+    function loadComments(context = 'watch') {
+      if(commentUnsubListener) commentUnsubListener();
+      const commentsQuery = query(collection(db, "comments"), where("videoId", "==", window.currentVideoId));
+      
+      commentUnsubListener = onSnapshot(commentsQuery, async (snap) => {
+        const listEl = document.getElementById(context === 'shorts' ? "shortsCommentList" : "commentsList"); 
+        if(!listEl) return;
+        listEl.innerHTML = ""; 
+        
+        const countTitle = document.getElementById(context === 'shorts' ? "shortsCommentCountTitle" : "commentCountTitle");
+        if(countTitle) countTitle.textContent = `${snap.size} Yorum`;
+        
+        let allComments = []; snap.forEach(docSnap => allComments.push({id: docSnap.id, ...docSnap.data()})); 
+        
+        const userIds = [...new Set(allComments.map(c => c.userId))]; const userCache = {};
+        for(let uid of userIds) { const userSnap = await getDoc(doc(db, "users", uid)); if(userSnap.exists()) userCache[uid] = userSnap.data(); }
+
+        const mainComments = allComments.filter(c => !c.parentId); mainComments.sort((a,b) => b.createdAt - a.createdAt);
+
+        for(let comment of mainComments) {
+          const userData = userCache[comment.userId]; const channelName = userData?.channelName || 'Bilinmiyor';
+          const canDelete = currentUser && (currentUser.uid === comment.userId || isAdmin() || currentUser.uid === window.currentUploaderId);
+          const likesCount = (comment.likedBy || []).length; const isLiked = currentUser && (comment.likedBy || []).includes(currentUser.uid);
+          const isOwner = comment.userId === window.currentUploaderId;
+
+          const replies = allComments.filter(c => c.parentId === comment.id); replies.sort((a,b) => a.createdAt - b.createdAt);
+          const el = document.createElement("div"); el.className = "flex flex-col gap-2 group";
+          
+          let repliesHTML = "";
+          for(let r of replies) {
+            const rUserData = userCache[r.userId]; const rChannelName = rUserData?.channelName || 'Bilinmiyor';
+            const rCanDelete = currentUser && (currentUser.uid === r.userId || isAdmin() || currentUser.uid === window.currentUploaderId);
+            const rLikesCount = (r.likedBy || []).length; const rIsLiked = currentUser && (r.likedBy || []).includes(currentUser.uid);
+            const rIsOwner = r.userId === window.currentUploaderId;
+            repliesHTML += `<div class="flex gap-3 pl-10 mt-3 pt-2 border-l-2 border-[#272727]"><img src="${getAv(rUserData)}" class="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80" onclick="goToChannel('${r.userId}')"><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="font-bold text-xs cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1" onclick="goToChannel('${r.userId}')">${rChannelName} ${getBdge(rUserData?.email)} ${rIsOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal">Kanal Sahibi</span>` : ""}</span><span class="text-[10px] text-gray-500">${new Date(r.createdAt).toLocaleDateString()}</span></div><p class="text-sm text-gray-200 whitespace-pre-line mb-2">${r.text}</p><div class="flex items-center gap-4 text-xs"><button onclick="toggleCommentLike('${r.id}')" class="flex items-center gap-1 font-bold ${rIsLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${rIsLiked ? 'solid' : 'regular'} fa-heart"></i> <span>${rLikesCount}</span></button>${rCanDelete ? `<button onclick="deleteComment('${r.id}')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>` : ""}</div></div></div>`;
+          }
+
+          el.innerHTML = `
+            <div class="flex gap-3"><img src="${getAv(userData)}" class="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80" onclick="goToChannel('${comment.userId}')">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1"><span class="font-bold text-sm cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1" onclick="goToChannel('${comment.userId}')">${channelName} ${getBdge(userData?.email)} ${isOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal">Kanal Sahibi</span>` : ""}</span><span class="text-xs text-gray-500">${new Date(comment.createdAt).toLocaleDateString()}</span></div>
+                <p class="text-sm text-gray-200 whitespace-pre-line mb-2">${comment.text}</p>
+                <div class="flex items-center gap-4 text-xs"><button onclick="toggleCommentLike('${comment.id}')" class="flex items-center gap-1 font-bold ${isLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${isLiked ? 'solid' : 'regular'} fa-heart"></i> <span>${likesCount}</span></button><button onclick="openReplyBox('${comment.id}', '@${channelName} ', '${context}')" class="font-bold text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-reply"></i> Yanıtla</button>${canDelete ? `<button onclick="deleteComment('${comment.id}')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>` : ""}</div>
+                <div id="replyBox_${context}_${comment.id}" class="hidden mt-3 flex flex-col gap-2 bg-[#181818] p-3 rounded-xl border border-[#333]"><textarea id="replyInput_${context}_${comment.id}" placeholder="Yanıtını yaz..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-sm text-white h-12"></textarea><div class="flex justify-end gap-2"><button onclick="closeReplyBox('${comment.id}', '${context}')" class="text-xs text-gray-400 hover:text-white px-3 py-1.5 transition-colors">İptal</button><button onclick="postReply('${comment.id}', '${context}')" class="theme-bg text-white px-4 py-1.5 rounded-full text-xs font-bold transition-colors">Yanıtla</button></div></div>
+                <div class="replies-wrapper">${repliesHTML}</div>
+              </div>
+            </div>`;
+          listEl.appendChild(el);
+        }
+      });
+    }
+
+    window.openShortsComments = (videoId, uploaderId) => {
+      window.currentVideoId = videoId; window.currentUploaderId = uploaderId;
+      if(myChannelData) { const avatarEl = document.getElementById("shortsMyCommentAvatar"); if(avatarEl) avatarEl.src = getAv(myChannelData); }
+      openModal('shortsCommentModal'); loadComments('shorts');
+    };
+
+    window.postComment = async (context = 'watch') => { 
+        if(!myChannelData) return showToast("Yorum yapmak için kanal oluşturmalısın!", "error"); 
+        const inputId = context === 'shorts' ? "shortsCommentInput" : "commentInput";
+        const inputEl = document.getElementById(inputId); const text = inputEl.value.trim(); if(!text) return; 
+        try { await addDoc(collection(db, "comments"), { videoId: window.currentVideoId, userId: currentUser.uid, text: text, likedBy: [], parentId: null, createdAt: Date.now() }); inputEl.value = ""; sendNotif(window.currentUploaderId, `${myChannelData.channelName} videona yorum yaptı`, `v_${window.currentVideoId}`); } catch(e) { showToast("Yorum eklenemedi!", "error"); } 
+    };
+
+    window.openReplyBox = (commentId, tag, context) => { const box = document.getElementById(`replyBox_${context}_${commentId}`); const input = document.getElementById(`replyInput_${context}_${commentId}`); box.classList.remove('hidden'); input.value = tag; input.focus(); };
+    window.closeReplyBox = (commentId, context) => { document.getElementById(`replyBox_${context}_${commentId}`).classList.add('hidden'); };
+    window.postReply = async (commentId, context) => {
+      if(!myChannelData) return showToast("Yanıt vermek için giriş yapın!", "error"); const input = document.getElementById(`replyInput_${context}_${commentId}`); const text = input.value.trim(); if(!text) return;
+      try { await addDoc(collection(db, "comments"), { videoId: window.currentVideoId, userId: currentUser.uid, text: text, likedBy: [], parentId: commentId, createdAt: Date.now() }); input.value = ""; window.closeReplyBox(commentId, context); showToast("Yanıt gönderildi!"); } catch(e) { showToast("Hata oluştu!", "error"); }
+    };
+    window.toggleCommentLike = async (commentId) => {
+      if(!currentUser) return showToast("Beğenmek için giriş yapmalısın!", "error"); const cRef = doc(db, "comments", commentId); const cSnap = await getDoc(cRef); if(!cSnap.exists()) return; const likedBy = cSnap.data().likedBy || [];
+      if(likedBy.includes(currentUser.uid)) { await updateDoc(cRef, { likedBy: arrayRemove(currentUser.uid) }); } else { await updateDoc(cRef, { likedBy: arrayUnion(currentUser.uid) }); }
+    };
+    window.deleteComment = async (commentId) => { if(confirm("Bu yorumu silmek istediğinize emin misiniz?")) await deleteDoc(doc(db, "comments", commentId)); };
+
+    window.toggleShortLike = async (id) => {
+      if(!currentUser) return showToast("Beğenmek için giriş yapın.", "error"); 
+      const videoRef = doc(db, "videos", id); const snap = await getDoc(videoRef); if(!snap.exists()) return;
+      let likesList = snap.data().likedBy || []; const likeIcon = document.getElementById(`shortLikeIcon_${id}`); const likeCountText = document.getElementById(`shortLikeCount_${id}`);
+      if(likesList.includes(currentUser.uid)) { await updateDoc(videoRef, { likedBy: arrayRemove(currentUser.uid) }); likesList = likesList.filter(uid => uid !== currentUser.uid); if(likeIcon) likeIcon.className = "fa-regular fa-heart text-white text-2xl transition-colors"; } 
+      else { await updateDoc(videoRef, { likedBy: arrayUnion(currentUser.uid) }); likesList.push(currentUser.uid); if(likeIcon) likeIcon.className = "fa-solid fa-heart text-red-500 text-2xl transition-colors"; } 
+      if(likeCountText) likeCountText.textContent = likesList.length;
+      const vidObj = allVideos.find(v => v.id === id); if(vidObj) vidObj.likedBy = likesList;
+    };
+
+    window.toggleShortSave = async (id) => {
+      if(!myChannelData) return showToast("Kaydetmek için giriş yapıp kanal oluşturun.", "error"); 
+      const userRef = doc(db, "users", currentUser.uid); let savedList = myChannelData.savedVideos || []; const saveIcon = document.getElementById(`shortSaveIcon_${id}`);
+      if(savedList.includes(id)) { await updateDoc(userRef, { savedVideos: arrayRemove(id) }); myChannelData.savedVideos = savedList.filter(vid => vid !== id); if(saveIcon) saveIcon.className = "fa-regular fa-bookmark text-white text-2xl transition-colors"; showToast("Kaydedilenlerden çıkarıldı"); } 
+      else { await updateDoc(userRef, { savedVideos: arrayUnion(id) }); myChannelData.savedVideos.push(id); if(saveIcon) saveIcon.className = "fa-solid fa-bookmark theme-text text-2xl transition-colors"; showToast("Video kaydedildi!"); } 
+    };
+
+    window.shareShort = (id) => { navigator.clipboard.writeText(`https://vidwave.app/watch?v=${id}`); showToast("Video linki kopyalandı!"); };
+
+    window.playVideo = async (videoId, videoObj, cachedUsers = null) => {
+      window.currentVideoId = videoId; currentVideoData = videoObj; window.currentUploaderId = videoObj.uploaderId; switchView('watchView');
+      const playerEl = document.getElementById("player"); playerEl.src = videoObj.videoUrl; currentSpeed = 1; playerEl.playbackRate = currentSpeed; playerEl.loop = false;
+      document.getElementById("speedBtn").innerHTML = `<i class="fa-solid fa-gauge-high"></i> 1x`; document.getElementById("loopBtn").innerHTML = `<i class="fa-solid fa-repeat"></i> Kapalı`; document.getElementById("loopBtn").classList.remove("theme-text"); 
+      document.getElementById("playerTitle").textContent = videoObj.title; document.getElementById("playerDescription").textContent = videoObj.description || ""; document.getElementById("playerViewsCount").textContent = videoObj.views || 0; document.getElementById("playerDate").textContent = new Date(videoObj.createdAt).toLocaleDateString();
+      
+      let uploaderData = cachedUsers ? cachedUsers[videoObj.uploaderId] : null; 
+      if(!uploaderData) { const snap = await getDoc(doc(db,"users",videoObj.uploaderId)); if(snap.exists()) uploaderData = snap.data(); }
+      
+      document.getElementById("playerChannelName").innerHTML = (uploaderData?.channelName || videoObj.channelName) + getBdge(uploaderData?.email); 
+      document.getElementById("playerAvatar").src = getAv(uploaderData); document.getElementById("playerSubCount").textContent = `${(uploaderData?.subscribers || []).length} Abone`;
+      
+      const deleteBtn = document.getElementById("deleteVidBtn"); const editBtn = document.getElementById("editVidBtn");
+      if(currentUser && (currentUser.uid === videoObj.uploaderId || isAdmin())) deleteBtn.classList.replace("hidden", "flex"); else deleteBtn.classList.replace("flex", "hidden");
+      if(currentUser && currentUser.uid === videoObj.uploaderId) editBtn.classList.replace("hidden", "flex"); else editBtn.classList.replace("flex", "hidden");
+
+      updateLikeUI(videoObj.likedBy || []); updateSubscribeUI(uploaderData?.subscribers || [], "subscribeBtn"); updateSaveUI();
+      
+      if(!viewedVideos.has(videoId)) { viewedVideos.add(videoId); await updateDoc(doc(db, "videos", videoId), { views: increment(1) }); document.getElementById("playerViewsCount").textContent = (videoObj.views || 0) + 1; }
+      if(currentUser && myChannelData) { const historyArr = myChannelData.history || []; if(!historyArr.includes(videoId)) { historyArr.push(videoId); await updateDoc(doc(db, "users", currentUser.uid), { history: historyArr }); myChannelData.history = historyArr; } }
+
+      const recs = allVideos.filter(x => x.id !== videoId).slice(0, 8); const recGrid = document.getElementById("recommendationGrid"); recGrid.innerHTML = "";
+      recs.forEach(recVid => { 
+          const el = document.createElement("div"); el.className = "flex gap-3 cursor-pointer group"; 
+          el.innerHTML = `<div class="w-40 aspect-video bg-[#181818] rounded-xl overflow-hidden flex-shrink-0 border border-[#272727]"><img src="${getTh(recVid)}" class="w-full h-full object-cover"></div><div class="flex-1 py-1 pr-2"><h4 class="font-bold text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${recVid.title}</h4><p class="text-xs text-gray-400 mt-1">${recVid.channelName}</p></div>`; 
+          el.onclick = () => playVideo(recVid.id, recVid); recGrid.appendChild(el); 
+      });
+      loadComments('watch');
+    };
+
+    window.toggleSave = async () => { 
+      if(!myChannelData) return showToast("Lütfen giriş yapıp kanal oluşturun.", "error"); 
+      const userRef = doc(db, "users", currentUser.uid); const savedList = myChannelData.savedVideos || []; 
+      if(savedList.includes(window.currentVideoId)) { await updateDoc(userRef, { savedVideos: arrayRemove(window.currentVideoId) }); myChannelData.savedVideos = savedList.filter(id => id !== window.currentVideoId); updateSaveUI(); showToast("Kaydedilenlerden çıkarıldı"); } 
+      else { await updateDoc(userRef, { savedVideos: arrayUnion(window.currentVideoId) }); myChannelData.savedVideos = [...savedList, window.currentVideoId]; updateSaveUI(); showToast("Video kaydedildi!"); } 
+    };
+    
+    function updateSaveUI() { 
+      const btn = document.getElementById("saveBtn"); const savedList = myChannelData?.savedVideos || []; 
+      if(savedList.includes(window.currentVideoId)) btn.innerHTML = `<i class="fa-solid fa-bookmark theme-text"></i> Kaydedildi`; else btn.innerHTML = `<i class="fa-regular fa-bookmark"></i> Kaydet`;
+    }
+
+    window.toggleLike = async () => { 
+      if(!currentUser) return showToast("Beğenmek için giriş yapın.", "error"); 
+      const videoRef = doc(db, "videos", window.currentVideoId); const snap = await getDoc(videoRef); const likesList = snap.data().likedBy || []; 
+      if(likesList.includes(currentUser.uid)) { await updateDoc(videoRef, { likedBy: arrayRemove(currentUser.uid) }); updateLikeUI(likesList.filter(id => id !== currentUser.uid)); } 
+      else { await updateDoc(videoRef, { likedBy: arrayUnion(currentUser.uid) }); updateLikeUI([...likesList, currentUser.uid]); } 
+    };
+    
+    function updateLikeUI(likesList) { 
+      const btn = document.getElementById("likeBtn"); document.getElementById("playerLikesCount").textContent = likesList.length; 
+      if(currentUser && likesList.includes(currentUser.uid)) { btn.classList.add("theme-text"); btn.querySelector("i").className = "fa-solid fa-thumbs-up"; } else { btn.classList.remove("theme-text"); btn.querySelector("i").className = "fa-regular fa-thumbs-up"; } 
+    }
+
+    window.toggleSubscribe = () => handleSub(window.currentUploaderId, "subscribeBtn", "playerSubCount"); 
+    window.toggleSubscribeFromChannel = () => handleSub(currentChannelViewId, "cvSubBtn", "cvStats", true);
+    
+    async function handleSub(targetUid, btnId, countId) {
+      if(!currentUser) return showToast("Abone olmak için giriş yapın.", "error"); if(currentUser.uid === targetUid) return showToast("Kendinize abone olamazsınız!", "error");
+      const targetUserRef = doc(db, "users", targetUid); const snap = await getDoc(targetUserRef); const subsList = snap.data().subscribers || [];
+      if(subsList.includes(currentUser.uid)) { await updateDoc(targetUserRef, { subscribers: arrayRemove(currentUser.uid) }); updateSubscribeUI(subsList.filter(id => id !== currentUser.uid), btnId); document.getElementById(countId).textContent = `${subsList.length - 1} Abone`; } 
+      else { await updateDoc(targetUserRef, { subscribers: arrayUnion(currentUser.uid) }); updateSubscribeUI([...subsList, currentUser.uid], btnId); document.getElementById(countId).textContent = `${subsList.length + 1} Abone`; showToast("Abone olundu!"); sendNotif(targetUid, `${myChannelData.channelName} sana abone oldu`, `c_${currentUser.uid}`); } 
+    }
+    
+    function updateSubscribeUI(subsList, btnId) {
+      const btn = document.getElementById(btnId);
+      if(currentUser && subsList.includes(currentUser.uid)) { btn.textContent = "Abone Olundu"; if(btnId === "cvSubBtn") btn.className = "bg-[#272727] text-white px-6 py-2.5 rounded-full font-bold border border-[#333]"; else btn.className = "ml-4 bg-[#272727] text-white px-4 py-2 rounded-full text-sm font-bold border border-gray-600"; } 
+      else { btn.textContent = "Abone Ol"; if(btnId === "cvSubBtn") btn.className = "bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-full font-bold border border-gray-300"; else btn.className = "ml-4 bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-bold border border-gray-300"; } 
+    }
+
+    window.goToChannel = async (userId) => { 
+      currentChannelViewId = userId; switchView('channelView'); switchChannelTab('videos');
+      const snap = await getDoc(doc(db, "users", userId)); const userData = snap.exists() ? snap.data() : { channelName: 'Bilinmiyor', subscribers: [] };
+      document.getElementById("channelBanner").style.backgroundImage = `url('${getBn(userData)}')`; document.getElementById("cvAvatar").src = getAv(userData); document.getElementById("cvName").innerHTML = userData.channelName + getBdge(userData.email); document.getElementById("cvStats").textContent = `${(userData.subscribers || []).length} Abone`;
+      updateSubscribeUI(userData.subscribers || [], "cvSubBtn"); if(currentUser && currentUser.uid === userId) document.getElementById("cvSubBtn").classList.add("hidden"); else document.getElementById("cvSubBtn").classList.remove("hidden");
+      renderChannelVideos(userId, userData); loadCommunityPosts(userId);
+    };
+
+    window.switchChannelTab = (tab) => {
+      const vGrid = document.getElementById("cvVideoGrid"); const cArea = document.getElementById("cvCommunityArea"); const tVBtn = document.getElementById("tabVideosBtn"); const tCBtn = document.getElementById("tabCommunityBtn");
+      if(tab === 'videos') { vGrid.classList.remove("hidden"); cArea.classList.add("hidden"); tVBtn.className = "px-2 py-3 border-b-2 font-bold theme-text"; tVBtn.style.borderColor = "var(--theme-main)"; tCBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors"; tCBtn.style.borderColor = "transparent"; } 
+      else { vGrid.classList.add("hidden"); cArea.classList.remove("hidden"); tCBtn.className = "px-2 py-3 border-b-2 font-bold theme-text"; tCBtn.style.borderColor = "var(--theme-main)"; tVBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors"; tVBtn.style.borderColor = "transparent";
+        const postBox = document.getElementById("createPostBox"); if(currentUser && currentUser.uid === currentChannelViewId) { postBox.classList.remove("hidden"); } else { postBox.classList.add("hidden"); }
+      }
+    };
+
+    function renderChannelVideos(userId, userData = null) { 
+      const grid = document.getElementById("cvVideoGrid"); grid.innerHTML = ""; const userVideos = allVideos.filter(v => v.uploaderId === userId); 
+      if(userVideos.length === 0) { grid.innerHTML = `<p class="text-gray-500 py-10 col-span-full text-center">Bu kanalda henüz video bulunmuyor.</p>`; return; }
+      userVideos.forEach(v => { 
+        const canDelete = currentUser && (currentUser.uid === v.uploaderId || isAdmin()); const card = document.createElement("div"); card.className = "cursor-pointer group flex flex-col gap-2 relative"; 
+        card.innerHTML = `${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${v.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 z-10 flex items-center justify-center transition-opacity"><i class="fa-solid fa-trash text-sm"></i></button>` : ""}<div class="aspect-video bg-[#181818] rounded-xl overflow-hidden relative border border-[#272727]"><img src="${getTh(v)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"></div><div><h4 class="font-bold text-sm line-clamp-2 text-white group-hover-theme-text transition-colors">${v.title}</h4><p class="text-xs text-gray-400 mt-1">${v.views || 0} İzlenme • ${v.likedBy?.length || 0} Beğeni</p></div>`; 
+        card.onclick = () => playVideo(v.id, v, userData ? {[userId]: userData} : null); grid.appendChild(card); 
+      }); 
+    }
+
+    window.publishCommunityPost = async () => {
+      const input = document.getElementById("postContentInput"); const text = input.value.trim(); if(!text) return showToast("Boş gönderi paylaşılamaz!", "error");
+      try { await addDoc(collection(db, "posts"), { channelId: currentUser.uid, text: text, likedBy: [], createdAt: Date.now() }); input.value = ""; showToast("Topluluk gönderisi yayınlandı!"); } catch(e) { showToast("Hata oluştu!", "error"); }
+    };
+
+    let postUnsubListener = null;
+    function loadCommunityPosts(channelId) {
+      if(postUnsubListener) postUnsubListener(); const pQuery = query(collection(db, "posts"), where("channelId", "==", channelId));
+      postUnsubListener = onSnapshot(pQuery, async (snap) => {
+        const listEl = document.getElementById("communityPostsList"); listEl.innerHTML = ""; let posts = []; snap.forEach(d => posts.push({ id: d.id, ...d.data() })); posts.sort((a,b) => b.createdAt - a.createdAt);
+        if(posts.length === 0) { listEl.innerHTML = `<p class="text-gray-500 text-center py-10">Henüz topluluk gönderisi paylaşılmamış.</p>`; return; }
+        const userSnap = await getDoc(doc(db, "users", channelId)); const userData = userSnap.exists() ? userSnap.data() : null;
+        posts.forEach(p => {
+          const canDelete = currentUser && (currentUser.uid === p.channelId || isAdmin()); const isLiked = currentUser && (p.likedBy || []).includes(currentUser.uid); const likesCount = (p.likedBy || []).length;
+          const card = document.createElement("div"); card.className = "bg-[#181818] border border-[#272727] p-5 rounded-2xl flex flex-col gap-3 relative shadow-md";
+          card.innerHTML = `${canDelete ? `<button onclick="deleteCommunityPost('${p.id}')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i></button>` : ""}<div class="flex items-center gap-3"><img src="${getAv(userData)}" class="w-10 h-10 rounded-full object-cover border border-[#333]"><div><h4 class="font-bold text-sm text-white">${userData?.channelName || 'Kanal'}</h4><p class="text-xs text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</p></div></div><p class="text-sm text-gray-200 whitespace-pre-line">${p.text}</p><div class="flex items-center gap-4 pt-2 border-t border-[#272727] text-xs"><button onclick="togglePostLike('${p.id}')" class="flex items-center gap-1.5 font-bold ${isLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${isLiked ? 'solid' : 'regular'} fa-thumbs-up text-sm"></i> <span>${likesCount}</span></button></div>`;
+          listEl.appendChild(card);
+        });
+      });
+    }
+
+    window.togglePostLike = async (postId) => {
+      if(!currentUser) return showToast("Beğenmek için giriş yapmalısın!", "error"); const pRef = doc(db, "posts", postId); const pSnap = await getDoc(pRef); if(!pSnap.exists()) return; const likedBy = pSnap.data().likedBy || [];
+      if(likedBy.includes(currentUser.uid)) { await updateDoc(pRef, { likedBy: arrayRemove(currentUser.uid) }); } else { await updateDoc(pRef, { likedBy: arrayUnion(currentUser.uid) }); }
+    };
+    window.deleteCommunityPost = async (postId) => { if(confirm("Bu gönderiyi silmek istediğinize emin misiniz?")) await deleteDoc(doc(db, "posts", postId)); };
+  </script>
+</body>
+</html>
