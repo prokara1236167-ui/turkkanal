@@ -99,7 +99,15 @@
     </div>
 
     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-      <div class="relative" id="notifContainer">
+      
+      <!-- Mesajlar İkonu (Yeni) -->
+      <div class="relative hidden sm:block" id="msgNavContainer">
+        <button onclick="openMessagesView()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative text-xs sm:text-base">
+          <i class="fa-solid fa-envelope"></i><span id="msgBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-500 rounded-full border-2 border-[#0f0f0f]"></span>
+        </button>
+      </div>
+
+      <div class="relative hidden sm:block" id="notifContainer">
         <button onclick="toggleNotifs()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative text-xs sm:text-base">
           <i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full border-2 border-[#0f0f0f]"></span>
         </button>
@@ -125,6 +133,8 @@
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#212121] border border-[#333] rounded-xl shadow-2xl py-2 z-50">
             <div class="px-4 py-3 border-b border-[#333] mb-1 bg-[#181818]"><p id="dropName" class="font-bold text-sm truncate flex items-center gap-2 text-white"></p><p id="dropEmail" class="text-xs text-gray-400 truncate mt-1"></p></div>
             <a href="javascript:void(0)" onclick="goToMyChannel()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-user-astronaut w-6 text-gray-400"></i> Kanalım</a>
+            <!-- Mobil İçin Mesajlar Menüye Eklendi -->
+            <a href="javascript:void(0)" onclick="openMessagesView()" class="block sm:hidden px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-envelope w-6 text-gray-400"></i> Mesajlar <span id="msgMenuBadge" class="hidden ml-2 bg-blue-500 text-white text-[10px] px-1.5 rounded-full">Yeni</span></a>
             <a href="javascript:void(0)" onclick="openMySubscribers()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-users w-6 text-gray-400"></i> Abonelerim</a>
             <a href="javascript:void(0)" onclick="openSavedVideos()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-bookmark w-6 text-gray-400"></i> Kaydedilenler</a>
             <a href="javascript:void(0)" onclick="openHistory()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-clock-rotate-left w-6 text-gray-400"></i> İzleme Geçmişi</a>
@@ -178,7 +188,6 @@
     <!-- 2. SHORTS GÖRÜNÜMÜ -->
     <div id="shortsView" class="hidden snap-container bg-black relative">
       <div id="shortsContainer" class="max-w-[450px] mx-auto h-full relative border-x border-[#272727]"></div>
-      <!-- Ana ekrana dön -->
       <button onclick="switchView('homeView')" class="fixed top-20 left-4 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center z-[60] hover:bg-black border border-white/20 shadow-lg">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
@@ -188,7 +197,7 @@
     <div id="watchView" class="hidden p-3 sm:p-6 max-w-[1600px] mx-auto transition-all duration-300 pb-16">
       <div class="flex flex-col lg:flex-row gap-6" id="watchLayout">
         
-        <!-- SOL SÜTUN: VİDEO VE YORUMLAR -->
+        <!-- SOL SÜTUN -->
         <div class="flex-1 lg:w-2/3 transition-all duration-300" id="videoPrimary">
           <div class="bg-black rounded-xl sm:rounded-2xl overflow-hidden aspect-video w-full shadow-2xl border border-[#272727] relative group" id="playerContainer">
             <video id="player" controls autoplay class="w-full h-full object-contain"></video>
@@ -220,7 +229,7 @@
           </div>
           <div class="mt-4 bg-[#272727]/50 p-3 sm:p-4 rounded-xl text-xs sm:text-sm whitespace-pre-line text-gray-200"><p id="playerDescription"></p></div>
 
-          <!-- YORUMLAR (ANA VİDEO EKRANI) -->
+          <!-- YORUMLAR -->
           <div class="mt-8">
             <h3 class="font-bold text-base sm:text-lg mb-4 text-white" id="commentCountTitle">Yorumlar</h3>
             <div class="flex gap-2 sm:gap-3 mb-6">
@@ -234,7 +243,7 @@
           </div>
         </div>
 
-        <!-- SAĞ SÜTUN: ÖNERİLEN VİDEOLAR -->
+        <!-- SAĞ SÜTUN -->
         <div class="w-full lg:w-[400px] xl:w-[450px] flex flex-col gap-3 transition-all duration-300">
           <div id="recommendationGrid" class="flex flex-col gap-3"></div>
         </div>
@@ -252,7 +261,11 @@
             <h1 id="cvName" class="text-2xl sm:text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1>
             <p id="cvStats" class="text-gray-400 text-xs sm:text-sm mt-1 cursor-pointer hover:text-white hover:underline transition-colors" title="Aboneleri Göster" onclick="if(currentChannelViewId) openSubscribersList(currentChannelViewId)"></p>
           </div>
-          <div class="sm:mt-16"><button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button></div>
+          <div class="sm:mt-16 flex gap-2">
+            <!-- YENİ: MESAJ GÖNDER BUTONU -->
+            <button id="cvMessageBtn" onclick="startChatFromChannel()" class="hidden bg-[#272727] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-[#333] transition-colors hover:bg-[#3f3f3f]" title="Mesaj Gönder"><i class="fa-solid fa-envelope"></i></button>
+            <button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button>
+          </div>
         </div>
         <div class="border-b border-[#272727] mb-6 flex gap-6">
           <button id="tabVideosBtn" onclick="switchChannelTab('videos')" class="px-2 py-3 border-b-2 font-bold theme-text text-sm sm:text-base" style="border-color: var(--theme-main)">Videolar</button>
@@ -302,33 +315,71 @@
         <button onclick="saveSettings()" id="settingsSaveBtn" class="theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl mt-2 theme-shadow transition-colors text-xs sm:text-base">Değişiklikleri Kaydet</button>
       </div>
     </div>
+
+    <!-- 6. MESAJLAR GÖRÜNÜMÜ (YENİ) -->
+    <div id="messagesView" class="hidden p-3 sm:p-6 max-w-[1200px] mx-auto min-h-full pb-16 h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] flex gap-4">
+      
+      <!-- Sol Menü: Sohbet Listesi (Mobilde chat açıkken gizlenir) -->
+      <div id="chatSidebar" class="w-full sm:w-1/3 lg:w-1/4 bg-[#181818] border border-[#272727] rounded-2xl flex flex-col h-full overflow-hidden shadow-xl shrink-0 transition-all">
+         <div class="p-4 border-b border-[#333] font-bold text-white flex items-center justify-between gap-2 shrink-0">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope theme-text"></i> Mesajlar</span>
+         </div>
+         <div id="conversationList" class="flex-1 overflow-y-auto hide-scroll p-2 flex flex-col gap-1">
+             <div class="text-center text-gray-500 text-xs py-10">Sohbet yükleniyor...</div>
+         </div>
+      </div>
+
+      <!-- Sağ Alan: Aktif Sohbet (Mobilde sohbet yoksa gizlenir) -->
+      <div id="chatArea" class="hidden sm:flex flex-1 bg-[#181818] border border-[#272727] rounded-2xl flex-col h-full overflow-hidden shadow-xl relative transition-all">
+         
+         <!-- Boş Durum -->
+         <div id="chatEmptyState" class="flex-1 flex flex-col items-center justify-center text-gray-500">
+            <i class="fa-solid fa-paper-plane text-4xl sm:text-5xl mb-3 opacity-50"></i>
+            <p class="text-sm sm:text-base font-medium">Bir sohbet seçin veya kanaldan mesaj gönderin.</p>
+         </div>
+
+         <!-- Aktif Sohbet Ekranı -->
+         <div id="chatActiveState" class="hidden flex-col h-full">
+           <!-- Sohbet Üst Bar -->
+           <div class="p-3 sm:p-4 border-b border-[#333] flex items-center gap-3 bg-[#121212] z-10 shrink-0 shadow-sm">
+             <button onclick="closeChatMobile()" class="sm:hidden text-white w-8 h-8 rounded-full hover:bg-[#272727] transition-colors flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+             <img id="chatActiveAvatar" src="" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer border border-[#333]" onclick="if(activeChatUserId) goToChannel(activeChatUserId)">
+             <h3 id="chatActiveName" class="font-bold text-white text-sm sm:text-base cursor-pointer hover:underline" onclick="if(activeChatUserId) goToChannel(activeChatUserId)"></h3>
+           </div>
+           
+           <!-- Sohbet Balonları -->
+           <div id="chatMessagesBox" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 hide-scroll"></div>
+           
+           <!-- Mesaj Yazma Alanı -->
+           <div class="p-3 border-t border-[#333] bg-[#121212] flex gap-2 shrink-0 items-center">
+             <input type="text" id="chatInput" placeholder="Mesaj yaz..." class="flex-1 bg-transparent border border-[#3f3f3f] focus:border-blue-500 outline-none rounded-full px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white transition-colors" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+             <button onclick="sendChatMessage()" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full theme-bg text-white flex items-center justify-center transition-transform hover:scale-105 shrink-0"><i class="fa-solid fa-paper-plane text-xs sm:text-sm"></i></button>
+           </div>
+         </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ========================================= -->
   <!-- MODALLAR                                  -->
   <!-- ========================================= -->
   
-  <!-- ABONELER MODALI -->
   <div id="subscribersModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#212121] border border-[#333] rounded-2xl sm:rounded-3xl w-full max-w-md relative flex flex-col shadow-2xl h-[75vh] sm:h-[70vh]">
       <div class="flex justify-between items-center p-4 sm:p-5 border-b border-[#333] shrink-0">
         <h3 class="font-bold text-white text-base sm:text-lg flex items-center gap-2"><i class="fa-solid fa-users theme-text"></i> <span id="subscribersCountTitle">Aboneler (0)</span></h3>
-        <button onclick="closeModal('subscribersModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors">
-          <i class="fa-solid fa-xmark text-lg sm:text-xl"></i>
-        </button>
+        <button onclick="closeModal('subscribersModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-lg sm:text-xl"></i></button>
       </div>
       <div id="subscribersList" class="flex-1 overflow-y-auto p-3 sm:p-4 flex flex-col gap-2 hide-scroll"></div>
     </div>
   </div>
 
-  <!-- SHORTS YORUM MODALI -->
   <div id="shortsCommentModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-[#212121] sm:border border-[#333] w-full sm:max-w-lg h-[75vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform">
       <div class="flex justify-between items-center p-4 border-b border-[#333] shrink-0">
         <h3 class="font-bold text-white text-sm sm:text-base" id="shortsCommentCountTitle">Yorumlar</h3>
-        <button onclick="closeModal('shortsCommentModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors">
-          <i class="fa-solid fa-xmark text-lg sm:text-xl"></i>
-        </button>
+        <button onclick="closeModal('shortsCommentModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-lg sm:text-xl"></i></button>
       </div>
       <div id="shortsCommentList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-6 hide-scroll"></div>
       <div class="p-3 sm:p-4 border-t border-[#333] bg-[#181818] shrink-0 flex items-end gap-2 sm:gap-3 sm:rounded-b-3xl">
@@ -339,7 +390,6 @@
     </div>
   </div>
 
-  <!-- AUTH MODAL -->
   <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-sm relative shadow-2xl overflow-hidden">
       <button onclick="closeModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full transition-colors"><i class="fa-solid fa-xmark"></i></button>
@@ -354,7 +404,6 @@
     </div>
   </div>
 
-  <!-- KANAL OLUŞTUR MODAL -->
   <div id="channelModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-md relative">
       <button onclick="closeModal('channelModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
@@ -366,7 +415,6 @@
     </div>
   </div>
 
-  <!-- VİDEO YÜKLE MODAL -->
   <div id="uploadModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#212121] border border-[#333] p-5 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeModal('uploadModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
@@ -391,7 +439,6 @@
     </div>
   </div>
 
-  <!-- VİDEO DÜZENLE MODAL -->
   <div id="editModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#212121] border border-[#333] p-5 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeModal('editModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
@@ -450,6 +497,12 @@
     let isForgotMode = false; 
     let allVideos = []; 
     let allUsers = []; 
+    
+    // Mesajlar için Değişkenler
+    let allMessages = [];
+    let activeChatUserId = null;
+    let messagesUnsub = null;
+
     window.currentVideoId = null; 
     window.currentUploaderId = null; 
     let currentVideoData = null; 
@@ -515,7 +568,7 @@
     };
 
     window.switchView = (viewId, title = "") => {
-      ['homeView', 'watchView', 'channelView', 'settingsView', 'shortsView'].forEach(v => { document.getElementById(v).classList.add('hidden'); });
+      ['homeView', 'watchView', 'channelView', 'settingsView', 'shortsView', 'messagesView'].forEach(v => { document.getElementById(v).classList.add('hidden'); });
       document.getElementById(viewId).classList.remove('hidden'); 
       if(viewId !== 'watchView') document.getElementById('player').pause();
       if(viewId !== 'shortsView') document.querySelectorAll('.snap-item video').forEach(v => v.pause());
@@ -523,6 +576,7 @@
       const homeTitleEl = document.getElementById("homeTitle"); 
       if(viewId === 'homeView' && title) { homeTitleEl.innerHTML = title; homeTitleEl.classList.remove("hidden"); } else { homeTitleEl.classList.add("hidden"); }
       if(viewId === 'shortsView') renderShorts(); 
+      if(viewId === 'messagesView') renderConversationList(); // Mesajlar sekmesi açıldığında
       window.scrollTo(0,0);
     };
 
@@ -550,6 +604,10 @@
         document.getElementById("userSection").classList.remove("hidden"); document.getElementById("guestSection").classList.add("hidden");
         const modHtml = isAdmin() ? " <span class='theme-text font-bold'>(Kurucu)</span>" : "";
         document.getElementById("dropEmail").innerHTML = user.email + modHtml;
+        
+        // Mesajları Dinlemeye Başla
+        startListeningMessages();
+
         const docSnap = await getDoc(doc(db, "users", user.uid));
         if (docSnap.exists()) {
           myChannelData = docSnap.data(); myChannelData.email = user.email;
@@ -559,8 +617,212 @@
           document.getElementById("setBannerPreview").style.backgroundImage = `url(${getBn(myChannelData)})`; document.getElementById("dropName").innerHTML = myChannelData.channelName + getBdge(user.email);
           renderNotifs(myChannelData.notifications || []);
         } else { myChannelData = null; document.getElementById("createChannelBtn").classList.remove("hidden"); document.getElementById("uploadVideoBtn").classList.add("hidden"); }
-      } else { document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; }
+      } else { 
+        document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; 
+        if(messagesUnsub) messagesUnsub(); // Çıkış yapınca dinlemeyi durdur
+      }
     });
+
+    // === MESAJLAŞMA (DM) SİSTEMİ ===
+
+    function startListeningMessages() {
+      if(!currentUser) return;
+      if(messagesUnsub) messagesUnsub();
+      
+      const q = query(collection(db, "messages"), where("participants", "array-contains", currentUser.uid));
+      messagesUnsub = onSnapshot(q, (snap) => {
+          let msgs = [];
+          snap.forEach(d => msgs.push({id: d.id, ...d.data()}));
+          msgs.sort((a, b) => a.createdAt - b.createdAt); // Tarihe göre sırala
+          allMessages = msgs;
+          
+          updateUnreadMessagesBadge();
+          if(!document.getElementById('messagesView').classList.contains('hidden')) {
+              renderConversationList();
+              if(activeChatUserId) renderActiveChat(activeChatUserId);
+          }
+      });
+    }
+
+    function updateUnreadMessagesBadge() {
+        const unreadMsgs = allMessages.filter(m => m.receiverId === currentUser.uid && !m.read);
+        const navBadge = document.getElementById("msgBadge");
+        const menuBadge = document.getElementById("msgMenuBadge");
+        if(unreadMsgs.length > 0) {
+            if(navBadge) navBadge.classList.remove("hidden");
+            if(menuBadge) { menuBadge.classList.remove("hidden"); menuBadge.textContent = unreadMsgs.length; }
+        } else {
+            if(navBadge) navBadge.classList.add("hidden");
+            if(menuBadge) menuBadge.classList.add("hidden");
+        }
+    }
+
+    window.openMessagesView = () => {
+        if(!myChannelData) return showToast("Mesajlaşmak için kanal oluşturmalısın!", "error");
+        switchView('messagesView');
+    };
+
+    window.startChatFromChannel = () => {
+        if(!myChannelData) return showToast("Mesaj atmak için kanal oluşturmalısın.", "error");
+        if(currentChannelViewId === currentUser.uid) return;
+        
+        switchView('messagesView');
+        openChatWithUser(currentChannelViewId);
+    };
+
+    function renderConversationList() {
+        const listEl = document.getElementById("conversationList");
+        listEl.innerHTML = "";
+        
+        // Benzersiz konuştuğumuz kişileri bul
+        const contactsMap = new Map();
+        
+        // Önce allUsers'dan boş da olsa birini tıkladıysak (Henüz mesaj yoksa) onu listeye sahte ekleyelim
+        if(activeChatUserId && !allMessages.some(m => m.participants.includes(activeChatUserId))) {
+           const u = allUsers.find(x => x.id === activeChatUserId);
+           if(u) contactsMap.set(activeChatUserId, { user: u, lastMsg: null });
+        }
+
+        // Geçmiş mesajları grupla
+        const sortedMsgsDesc = [...allMessages].reverse();
+        sortedMsgsDesc.forEach(msg => {
+            const otherUid = msg.senderId === currentUser.uid ? msg.receiverId : msg.senderId;
+            if(!contactsMap.has(otherUid)) {
+                const userObj = allUsers.find(u => u.id === otherUid) || { id: otherUid, channelName: "Kullanıcı" };
+                contactsMap.set(otherUid, { user: userObj, lastMsg: msg });
+            }
+        });
+
+        if(contactsMap.size === 0) {
+            listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Henüz bir sohbetin yok.</p>`;
+            return;
+        }
+
+        contactsMap.forEach((data, otherUid) => {
+            const u = data.user;
+            const m = data.lastMsg;
+            const isUnread = m && m.receiverId === currentUser.uid && !m.read;
+            
+            const msgText = m ? (m.senderId === currentUser.uid ? `Sen: ${m.text}` : m.text) : "Yeni sohbet başlatın";
+            
+            const card = document.createElement("div");
+            card.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${activeChatUserId === otherUid ? 'bg-[#333]' : 'hover:bg-[#272727]'} ${isUnread ? 'border-l-2 border-blue-500 bg-[#272727]/50' : 'border-l-2 border-transparent'}`;
+            card.onclick = () => openChatWithUser(otherUid);
+            card.innerHTML = `
+                <img src="${getAv(u)}" class="w-10 h-10 rounded-full object-cover border border-[#333] shrink-0">
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm text-white truncate ${isUnread ? 'text-white' : 'text-gray-200'}">${u.channelName} ${getBdge(u.email)}</h4>
+                    <p class="text-xs truncate ${isUnread ? 'font-bold text-gray-300' : 'text-gray-500'}">${msgText}</p>
+                </div>
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    window.openChatWithUser = (userId) => {
+        activeChatUserId = userId;
+        renderConversationList(); // Seçili rengi güncelle
+        
+        // Mobil görünümde Sidebar gizle, Sohbet alanını göster
+        if(window.innerWidth < 640) {
+            document.getElementById("chatSidebar").classList.add("hidden");
+            document.getElementById("chatArea").classList.remove("hidden");
+            document.getElementById("chatArea").classList.add("flex");
+        }
+
+        renderActiveChat(userId);
+    };
+
+    window.closeChatMobile = () => {
+        activeChatUserId = null;
+        renderConversationList();
+        document.getElementById("chatArea").classList.add("hidden");
+        document.getElementById("chatArea").classList.remove("flex");
+        document.getElementById("chatSidebar").classList.remove("hidden");
+    };
+
+    async function renderActiveChat(userId) {
+        document.getElementById("chatEmptyState").classList.add("hidden");
+        document.getElementById("chatActiveState").classList.remove("hidden");
+        document.getElementById("chatActiveState").classList.add("flex");
+
+        const targetUser = allUsers.find(u => u.id === userId) || { id: userId, channelName: "Kullanıcı" };
+        document.getElementById("chatActiveAvatar").src = getAv(targetUser);
+        document.getElementById("chatActiveName").innerHTML = targetUser.channelName + getBdge(targetUser.email);
+
+        const box = document.getElementById("chatMessagesBox");
+        box.innerHTML = "";
+
+        const chatMsgs = allMessages.filter(m => m.participants.includes(userId));
+        
+        // Okunmadı olarak işaretlenen mesajları okundu yap
+        let batchUpdates = [];
+        chatMsgs.forEach(m => {
+            if(m.receiverId === currentUser.uid && !m.read) {
+                batchUpdates.push(updateDoc(doc(db, "messages", m.id), { read: true }));
+            }
+        });
+        if(batchUpdates.length > 0) Promise.all(batchUpdates); // Arka planda güncelle
+
+        if(chatMsgs.length === 0) {
+            box.innerHTML = `<div class="text-center text-xs text-gray-500 py-10">Burası biraz sessiz. İlk mesajı sen gönder!</div>`;
+        } else {
+            let lastDate = "";
+            chatMsgs.forEach(m => {
+                const isMe = m.senderId === currentUser.uid;
+                const msgDate = new Date(m.createdAt).toLocaleDateString();
+                const msgTime = new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if(lastDate !== msgDate) {
+                    box.innerHTML += `<div class="text-center text-[10px] text-gray-500 my-2">${msgDate}</div>`;
+                    lastDate = msgDate;
+                }
+
+                const msgDiv = document.createElement("div");
+                msgDiv.className = `flex flex-col max-w-[75%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
+                msgDiv.innerHTML = `
+                    <div class="px-3 py-2 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-[#272727] text-gray-200 rounded-tl-sm'} text-xs sm:text-sm whitespace-pre-line shadow-sm">
+                        ${m.text}
+                    </div>
+                    <span class="text-[9px] sm:text-[10px] text-gray-500 mt-1 flex items-center gap-1">
+                       ${msgTime} ${isMe ? (m.read ? '<i class="fa-solid fa-check-double text-blue-400"></i>' : '<i class="fa-solid fa-check text-gray-500"></i>') : ''}
+                    </span>
+                `;
+                box.appendChild(msgDiv);
+            });
+        }
+        
+        // Scroll en alta
+        setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+        document.getElementById("chatInput").focus();
+    }
+
+    window.sendChatMessage = async () => {
+        if(!currentUser || !activeChatUserId) return;
+        const input = document.getElementById("chatInput");
+        const text = input.value.trim();
+        if(!text) return;
+        
+        input.value = "";
+        try {
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                receiverId: activeChatUserId,
+                participants: [currentUser.uid, activeChatUserId],
+                text: text,
+                createdAt: Date.now(),
+                read: false
+            });
+            // Hızlı hissettirmesi için anında scroll (Snapshot zaten güncelleyecek)
+            setTimeout(() => {
+                const box = document.getElementById("chatMessagesBox");
+                box.scrollTop = box.scrollHeight;
+            }, 100);
+        } catch(e) {
+            showToast("Mesaj gönderilemedi", "error");
+        }
+    };
+
 
     function renderNotifs(notifs) {
       const list = document.getElementById("notifList"); const badge = document.getElementById("notifBadge"); list.innerHTML = ""; 
@@ -695,7 +957,7 @@
       else { const filtered = allVideos.filter(v => v.category === catName); renderVideoGrid(filtered); }
     };
     
-    // Gelişmiş Arama Listener'ı (Çift Çıkma Sorunu Düzeltildi)
+    // Gelişmiş Arama Listener'ı
     document.getElementById("searchInput").addEventListener("input", (e) => { 
         const searchTerm = e.target.value.toLowerCase().trim(); 
         if(document.getElementById('homeView').classList.contains('hidden')) switchView('homeView'); 
@@ -709,7 +971,7 @@
         // Kanalları Filtrele
         const searchChannels = allUsers.filter(u => u.channelName && u.channelName.toLowerCase().includes(searchTerm));
         
-        // Videoları Filtrele (Aynı videonun 2 kez çıkmaması için Set kontrolü)
+        // Videoları Filtrele
         const seenVideoIds = new Set();
         const searchVideos = [];
         for (let v of allVideos) {
@@ -1023,6 +1285,11 @@
       currentChannelViewId = userId; switchView('channelView'); switchChannelTab('videos');
       const snap = await getDoc(doc(db, "users", userId)); const userData = snap.exists() ? snap.data() : { channelName: 'Bilinmiyor', subscribers: [] };
       document.getElementById("channelBanner").style.backgroundImage = `url('${getBn(userData)}')`; document.getElementById("cvAvatar").src = getAv(userData); document.getElementById("cvName").innerHTML = userData.channelName + getBdge(userData.email); document.getElementById("cvStats").textContent = `${(userData.subscribers || []).length} Abone`;
+      
+      // DM butonu göster/gizle
+      const msgBtn = document.getElementById("cvMessageBtn");
+      if(currentUser && currentUser.uid !== userId) msgBtn.classList.remove("hidden"); else msgBtn.classList.add("hidden");
+
       updateSubscribeUI(userData.subscribers || [], "cvSubBtn"); if(currentUser && currentUser.uid === userId) document.getElementById("cvSubBtn").classList.add("hidden"); else document.getElementById("cvSubBtn").classList.remove("hidden");
       renderChannelVideos(userId, userData); loadCommunityPosts(userId);
     };
