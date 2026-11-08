@@ -124,6 +124,7 @@
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#212121] border border-[#333] rounded-xl shadow-2xl py-2 z-50">
             <div class="px-4 py-3 border-b border-[#333] mb-1 bg-[#181818]"><p id="dropName" class="font-bold text-sm truncate flex items-center gap-2 text-white"></p><p id="dropEmail" class="text-xs text-gray-400 truncate mt-1"></p></div>
             <a href="javascript:void(0)" onclick="goToMyChannel()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-user-astronaut w-6 text-gray-400"></i> Kanalım</a>
+            <a href="javascript:void(0)" onclick="openMySubscribers()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-users w-6 text-gray-400"></i> Abonelerim</a>
             <a href="javascript:void(0)" onclick="openSavedVideos()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-bookmark w-6 text-gray-400"></i> Kaydedilenler</a>
             <a href="javascript:void(0)" onclick="openHistory()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-clock-rotate-left w-6 text-gray-400"></i> İzleme Geçmişi</a>
             <a href="javascript:void(0)" onclick="openSettings()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-gear w-6 text-gray-400"></i> Ayarlar</a>
@@ -157,7 +158,16 @@
         <button onclick="filterCat('Eğlence')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Eğlence</button>
       </div>
       <h2 id="homeTitle" class="text-2xl font-bold text-white mb-6 hidden border-b border-[#272727] pb-3"></h2>
+      
+      <!-- KANAL ARAMA SONUÇLARI -->
+      <div id="channelsGrid" class="hidden mb-8">
+        <h3 class="font-bold text-lg text-white mb-4 border-b border-[#272727] pb-2"><i class="fa-solid fa-users theme-text mr-2"></i>Kanallar</h3>
+        <div id="channelsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+
+      <!-- VİDEO LİSTESİ -->
       <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8"></div>
+      
       <div id="emptyState" class="hidden flex flex-col items-center justify-center mt-32 text-gray-500">
         <div class="w-24 h-24 bg-[#1f1f1f] rounded-full flex items-center justify-center mb-4 border border-[#333]"><i class="fa-solid fa-satellite-dish text-4xl"></i></div>
         <h2 class="text-xl font-bold text-white mb-2">Henüz İçerik Yok</h2>
@@ -237,7 +247,10 @@
       <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 -mt-12 sm:-mt-16 mb-8 relative z-10">
           <img id="cvAvatar" src="" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-[#0f0f0f] bg-[#1f1f1f] shadow-xl">
-          <div class="mt-2 sm:mt-16 flex-1 text-center sm:text-left"><h1 id="cvName" class="text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1><p id="cvStats" class="text-gray-400 text-sm mt-1"></p></div>
+          <div class="mt-2 sm:mt-16 flex-1 text-center sm:text-left">
+            <h1 id="cvName" class="text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1>
+            <p id="cvStats" class="text-gray-400 text-sm mt-1 cursor-pointer hover:text-white hover:underline transition-colors" title="Aboneleri Göster" onclick="if(currentChannelViewId) openSubscribersList(currentChannelViewId)"></p>
+          </div>
           <div class="sm:mt-16"><button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-6 py-2.5 rounded-full font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button></div>
         </div>
         <div class="border-b border-[#272727] mb-6 flex gap-6">
@@ -294,6 +307,19 @@
   <!-- MODALLAR                                  -->
   <!-- ========================================= -->
   
+  <!-- ABONELER MODALI -->
+  <div id="subscribersModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#212121] border border-[#333] rounded-3xl w-full max-w-md relative flex flex-col shadow-2xl h-[70vh]">
+      <div class="flex justify-between items-center p-5 border-b border-[#333] shrink-0">
+        <h3 class="font-bold text-white text-lg flex items-center gap-2"><i class="fa-solid fa-users theme-text"></i> <span id="subscribersCountTitle">Aboneler (0)</span></h3>
+        <button onclick="closeModal('subscribersModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div id="subscribersList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 hide-scroll"></div>
+    </div>
+  </div>
+
   <!-- SHORTS YORUM MODALI (TİKTOK STİLİ) -->
   <div id="shortsCommentModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-[#212121] sm:border border-[#333] w-full sm:max-w-lg h-[75vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform">
@@ -422,6 +448,7 @@
     let isRegisterMode = false; 
     let isForgotMode = false; 
     let allVideos = []; 
+    let allUsers = []; // Yeni eklenen: Tüm kullanıcılar/kanallar hafızası
     window.currentVideoId = null; 
     window.currentUploaderId = null; 
     let currentVideoData = null; 
@@ -582,8 +609,36 @@
     
     window.openSettings = () => switchView('settingsView'); 
     window.goToMyChannel = () => { if(currentUser && myChannelData) goToChannel(currentUser.uid); };
+    window.openMySubscribers = () => { if(currentUser) openSubscribersList(currentUser.uid); };
     window.openSavedVideos = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-bookmark theme-text mr-2"></i> Kaydedilen Videolar'); const savedList = myChannelData.savedVideos || []; renderVideoGrid(allVideos.filter(v => savedList.includes(v.id))); };
     window.openHistory = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-clock-rotate-left theme-text mr-2"></i> İzleme Geçmişi'); const historyList = myChannelData.history || []; const filteredVideos = allVideos.filter(v => historyList.includes(v.id)); filteredVideos.sort((a, b) => historyList.indexOf(b.id) - historyList.indexOf(a.id)); renderVideoGrid(filteredVideos); };
+
+    // Yeni Eklenen: Aboneleri Gösterme Fonksiyonu
+    window.openSubscribersList = (userId) => {
+        const user = allUsers.find(u => u.id === userId);
+        if(!user) return;
+        
+        document.getElementById("subscribersCountTitle").textContent = `Aboneler (${(user.subscribers || []).length})`;
+        const listEl = document.getElementById("subscribersList");
+        listEl.innerHTML = "";
+        
+        if(!user.subscribers || user.subscribers.length === 0) {
+            listEl.innerHTML = `<p class="text-gray-500 text-sm text-center py-6">Henüz abone yok.</p>`;
+        } else {
+            user.subscribers.forEach(subId => {
+                const subUser = allUsers.find(u => u.id === subId) || { id: subId, channelName: "Bilinmeyen Kullanıcı" };
+                listEl.innerHTML += `
+                <div class="flex items-center gap-3 p-3 bg-[#181818] border border-[#272727] hover:border-gray-500 rounded-xl cursor-pointer transition-colors" onclick="closeModal('subscribersModal'); goToChannel('${subId}')">
+                    <img src="${getAv(subUser)}" class="w-12 h-12 rounded-full object-cover border border-[#333]">
+                    <div>
+                        <h4 class="font-bold text-sm text-white">${subUser.channelName} ${getBdge(subUser.email)}</h4>
+                        <p class="text-xs text-gray-400">${(subUser.subscribers || []).length} Abone</p>
+                    </div>
+                </div>`;
+            });
+        }
+        openModal("subscribersModal");
+    };
 
     window.saveSettings = async () => {
       if(!currentUser) return; 
@@ -628,6 +683,8 @@
     let currentCategoryFilter = "Tümü";
     window.filterCat = (catName) => {
       currentCategoryFilter = catName; 
+      document.getElementById("channelsGrid").classList.add("hidden"); // Kategori seçilince kanal aramayı gizle
+      document.getElementById("searchInput").value = ""; 
       document.querySelectorAll('.cat-btn').forEach(btn => { 
           btn.className = "cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]"; 
           if(btn.textContent.includes(catName)) { btn.className = "cat-btn active bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap"; }
@@ -637,15 +694,60 @@
       else { const filtered = allVideos.filter(v => v.category === catName); renderVideoGrid(filtered); }
     };
     
+    // Gelişmiş Arama Listener'ı
     document.getElementById("searchInput").addEventListener("input", (e) => { 
         const searchTerm = e.target.value.toLowerCase(); 
         if(document.getElementById('homeView').classList.contains('hidden')) switchView('homeView'); 
-        const searchResults = allVideos.filter(v => v.title.toLowerCase().includes(searchTerm) || v.channelName.toLowerCase().includes(searchTerm)); renderVideoGrid(searchResults); 
+        
+        if(!searchTerm) {
+            document.getElementById("channelsGrid").classList.add("hidden");
+            filterCat(currentCategoryFilter);
+            return;
+        }
+
+        // Kanalları ve Videoları Ayrı Ayrı Bul
+        const searchChannels = allUsers.filter(u => u.channelName && u.channelName.toLowerCase().includes(searchTerm));
+        const searchVideos = allVideos.filter(v => v.title.toLowerCase().includes(searchTerm) || v.channelName.toLowerCase().includes(searchTerm)); 
+        
+        renderChannelsGrid(searchChannels);
+        renderVideoGrid(searchVideos); 
+    });
+
+    window.renderChannelsGrid = (channelsArray) => {
+        const cGrid = document.getElementById("channelsGrid");
+        const cList = document.getElementById("channelsList");
+        cList.innerHTML = "";
+        
+        if(channelsArray.length === 0) {
+            cGrid.classList.add("hidden");
+            return;
+        }
+        
+        cGrid.classList.remove("hidden");
+        channelsArray.forEach(user => {
+            const el = document.createElement("div");
+            el.className = "flex items-center gap-3 bg-[#181818] p-3 rounded-xl border border-[#272727] cursor-pointer hover:border-gray-500 transition-colors shadow-sm";
+            el.onclick = () => goToChannel(user.id);
+            el.innerHTML = `
+                <img src="${getAv(user)}" class="w-12 h-12 rounded-full object-cover border border-[#333]">
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-white">${user.channelName} ${getBdge(user.email)}</h4>
+                    <p class="text-xs text-gray-400">${(user.subscribers || []).length} Abone</p>
+                </div>`;
+            cList.appendChild(el);
+        });
+    };
+
+    // Tüm Kullanıcıları ve Kanalları Arka Planda Eşitle (Arama ve Abone Listesi İçin)
+    onSnapshot(collection(db, "users"), (snapshot) => {
+      allUsers = [];
+      snapshot.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
     });
 
     onSnapshot(query(collection(db, "videos"), orderBy("createdAt", "desc")), async (snapshot) => {
       allVideos = []; snapshot.forEach(docSnap => allVideos.push({ id: docSnap.id, ...docSnap.data() }));
-      if(!document.getElementById('homeView').classList.contains('hidden') && document.getElementById("homeTitle").classList.contains("hidden")) { filterCat(currentCategoryFilter); }
+      const sInput = document.getElementById("searchInput").value;
+      if(!document.getElementById('homeView').classList.contains('hidden') && document.getElementById("homeTitle").classList.contains("hidden") && !sInput) { filterCat(currentCategoryFilter); }
       if(!document.getElementById('channelView').classList.contains('hidden') && currentChannelViewId) { renderChannelVideos(currentChannelViewId); }
     });
 
