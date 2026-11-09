@@ -79,28 +79,37 @@
 <body class="flex flex-col h-screen overflow-hidden" data-color="blue">
 
   <!-- ÜST BAR (NAVBAR) -->
-  <header class="h-16 border-b border-[#272727] bg-[#0f0f0f]/95 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 z-40 shrink-0 sticky top-0">
-    <div class="flex items-center gap-4">
-      <a href="javascript:void(0)" onclick="switchView('homeView')" class="flex items-center gap-2 text-2xl font-bold tracking-tighter hover:scale-105 transition-transform text-white">
-        <div class="w-8 h-8 theme-bg rounded-lg flex items-center justify-center theme-shadow"><i class="fa-solid fa-play text-white text-sm"></i></div>
-        <span>VidWave</span>
+  <header class="h-16 border-b border-[#272727] bg-[#0f0f0f]/95 backdrop-blur-md flex items-center justify-between px-3 sm:px-6 z-40 shrink-0 sticky top-0 gap-2 sm:gap-4">
+    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+      <a href="javascript:void(0)" onclick="switchView('homeView')" class="flex items-center gap-1.5 sm:gap-2 text-xl sm:text-2xl font-bold tracking-tighter hover:scale-105 transition-transform text-white">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 theme-bg rounded-lg flex items-center justify-center theme-shadow"><i class="fa-solid fa-play text-white text-xs sm:text-sm"></i></div>
+        <span class="hidden xs:inline sm:inline">VidWave</span>
       </a>
-      <button onclick="switchView('shortsView')" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-[#272727] transition-colors font-bold text-sm text-gray-300 hover:text-white">
+      <button onclick="switchView('shortsView')" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-[#272727] transition-colors font-bold text-xs sm:text-sm text-gray-300 hover:text-white shrink-0">
         <i class="fa-solid fa-bolt theme-text"></i> <span class="hidden sm:inline">Shorts</span>
       </button>
     </div>
 
-    <div class="flex items-center flex-1 max-w-2xl mx-6 hidden md:flex">
+    <!-- MOBİL UYUMLU ARAMA ALANI -->
+    <div class="flex items-center flex-1 max-w-xl mx-1 sm:mx-4">
       <div class="flex w-full items-center bg-[#121212] border border-[#303030] rounded-full overflow-hidden theme-border transition-colors">
-        <div class="pl-4 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></div>
-        <input type="text" id="searchInput" placeholder="Video veya Kanal ara..." class="w-full bg-transparent px-3 py-2.5 outline-none text-sm font-medium text-white">
+        <div class="pl-3 sm:pl-4 text-gray-400 text-xs sm:text-sm"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <input type="text" id="searchInput" placeholder="Ara..." class="w-full bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2.5 outline-none text-xs sm:text-sm font-medium text-white">
       </div>
     </div>
 
-    <div class="flex items-center gap-3 sm:gap-4">
+    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+      
+      <!-- Mesajlar İkonu -->
+      <div class="relative hidden sm:block" id="msgNavContainer">
+        <button onclick="openMessagesView()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative text-xs sm:text-base">
+          <i class="fa-solid fa-envelope"></i><span id="msgBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-500 rounded-full border-2 border-[#0f0f0f]"></span>
+        </button>
+      </div>
+
       <div class="relative hidden sm:block" id="notifContainer">
-        <button onclick="toggleNotifs()" class="w-10 h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative">
-          <i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0f0f0f]"></span>
+        <button onclick="toggleNotifs()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative text-xs sm:text-base">
+          <i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full border-2 border-[#0f0f0f]"></span>
         </button>
         <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 bg-[#212121] border border-[#333] rounded-xl shadow-2xl z-50 overflow-hidden">
           <div class="px-4 py-3 border-b border-[#333] font-bold text-white flex justify-between items-center">Bildirimler <button onclick="clearNotifs()" class="text-xs text-gray-400 hover:text-white transition-colors">Temizle</button></div>
@@ -108,22 +117,24 @@
         </div>
       </div>
 
-      <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white" title="Tema">
+      <button onclick="toggleTheme()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white text-xs sm:text-base" title="Tema">
         <i id="themeIcon" class="fa-solid fa-sun"></i>
       </button>
 
       <!-- Giriş Yapmış Kullanıcı -->
-      <div id="userSection" class="hidden flex items-center gap-3 sm:gap-4">
-        <button id="createChannelBtn" onclick="openModal('channelModal')" class="hidden theme-bg text-white px-4 py-2 rounded-full text-sm font-bold theme-shadow hover:scale-105 transition-transform">Kanal Oluştur</button>
-        <button id="uploadVideoBtn" onclick="openModal('uploadModal')" class="hidden flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-medium transition-colors text-white">
+      <div id="userSection" class="hidden flex items-center gap-2 sm:gap-4">
+        <button id="createChannelBtn" onclick="openModal('channelModal')" class="hidden theme-bg text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold theme-shadow hover:scale-105 transition-transform">Kanal</button>
+        <button id="uploadVideoBtn" onclick="openModal('uploadModal')" class="hidden flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors text-white">
           <i class="fa-solid fa-video theme-text"></i> <span class="hidden sm:inline">Oluştur</span>
         </button>
         
         <div class="relative group cursor-pointer" onclick="toggleDropdown()">
-          <img id="navAvatar" src="" class="w-9 h-9 rounded-full object-cover border border-[#303030] transition-colors hover:border-blue-500">
+          <img id="navAvatar" src="" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-[#303030] transition-colors hover:border-blue-500">
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#212121] border border-[#333] rounded-xl shadow-2xl py-2 z-50">
             <div class="px-4 py-3 border-b border-[#333] mb-1 bg-[#181818]"><p id="dropName" class="font-bold text-sm truncate flex items-center gap-2 text-white"></p><p id="dropEmail" class="text-xs text-gray-400 truncate mt-1"></p></div>
             <a href="javascript:void(0)" onclick="goToMyChannel()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-user-astronaut w-6 text-gray-400"></i> Kanalım</a>
+            <a href="javascript:void(0)" onclick="openMessagesView()" class="block sm:hidden px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-envelope w-6 text-gray-400"></i> Mesajlar <span id="msgMenuBadge" class="hidden ml-2 bg-blue-500 text-white text-[10px] px-1.5 rounded-full">Yeni</span></a>
+            <a href="javascript:void(0)" onclick="openMySubscribers()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-users w-6 text-gray-400"></i> Abonelerim</a>
             <a href="javascript:void(0)" onclick="openSavedVideos()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-bookmark w-6 text-gray-400"></i> Kaydedilenler</a>
             <a href="javascript:void(0)" onclick="openHistory()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-clock-rotate-left w-6 text-gray-400"></i> İzleme Geçmişi</a>
             <a href="javascript:void(0)" onclick="openSettings()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-gear w-6 text-gray-400"></i> Ayarlar</a>
@@ -135,8 +146,8 @@
 
       <!-- Ziyaretçi -->
       <div id="guestSection">
-        <button onclick="openModal('authModal')" class="flex items-center gap-2 bg-[#272727] theme-text hover:bg-[#333] px-5 py-2 rounded-full text-sm font-bold transition-colors">
-          <i class="fa-regular fa-user"></i> Giriş Yap
+        <button onclick="openModal('authModal')" class="flex items-center gap-1.5 sm:gap-2 bg-[#272727] theme-text hover:bg-[#333] px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-colors">
+          <i class="fa-regular fa-user"></i> <span class="hidden xs:inline sm:inline">Giriş Yap</span>
         </button>
       </div>
     </div>
@@ -146,40 +157,48 @@
   <main class="flex-1 overflow-y-auto w-full relative" id="mainScroll">
     
     <!-- 1. ANASAYFA -->
-    <div id="homeView" class="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-full">
-      <div id="categoryBar" class="flex gap-3 overflow-x-auto hide-scroll pb-2 mb-6 border-b border-[#272727]">
-        <button onclick="filterCat('Tümü')" class="cat-btn active bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap">Tümü</button>
-        <button onclick="filterCat('Trendler')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]"><i class="fa-solid fa-fire text-red-500 mr-1"></i> Trendler</button>
-        <button onclick="filterCat('Oyun')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Oyun</button>
-        <button onclick="filterCat('Müzik')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Müzik</button>
-        <button onclick="filterCat('Eğitim')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Eğitim</button>
-        <button onclick="filterCat('Yazılım')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Yazılım</button>
-        <button onclick="filterCat('Eğlence')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]">Eğlence</button>
+    <div id="homeView" class="p-3 sm:p-6 max-w-[1600px] mx-auto min-h-full pb-16">
+      <div id="categoryBar" class="flex gap-2 sm:gap-3 overflow-x-auto hide-scroll pb-2 mb-4 sm:mb-6 border-b border-[#272727]">
+        <button onclick="filterCat('Tümü')" class="cat-btn active bg-white text-black px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap">Tümü</button>
+        <button onclick="filterCat('Trendler')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]"><i class="fa-solid fa-fire text-red-500 mr-1"></i> Trendler</button>
+        <button onclick="filterCat('Oyun')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]">Oyun</button>
+        <button onclick="filterCat('Müzik')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]">Müzik</button>
+        <button onclick="filterCat('Eğitim')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]">Eğitim</button>
+        <button onclick="filterCat('Yazılım')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]">Yazılım</button>
+        <button onclick="filterCat('Eğlence')" class="cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]">Eğlence</button>
       </div>
-      <h2 id="homeTitle" class="text-2xl font-bold text-white mb-6 hidden border-b border-[#272727] pb-3"></h2>
-      <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8"></div>
-      <div id="emptyState" class="hidden flex flex-col items-center justify-center mt-32 text-gray-500">
-        <div class="w-24 h-24 bg-[#1f1f1f] rounded-full flex items-center justify-center mb-4 border border-[#333]"><i class="fa-solid fa-satellite-dish text-4xl"></i></div>
-        <h2 class="text-xl font-bold text-white mb-2">Henüz İçerik Yok</h2>
+      <h2 id="homeTitle" class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 hidden border-b border-[#272727] pb-3"></h2>
+      
+      <!-- KANAL ARAMA SONUÇLARI -->
+      <div id="channelsGrid" class="hidden mb-6 sm:mb-8">
+        <h3 class="font-bold text-base sm:text-lg text-white mb-3 sm:mb-4 border-b border-[#272727] pb-2"><i class="fa-solid fa-users theme-text mr-2"></i>Kanallar</h3>
+        <div id="channelsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+      </div>
+
+      <!-- VİDEO LİSTESİ -->
+      <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-6 sm:gap-y-8"></div>
+      
+      <div id="emptyState" class="hidden flex flex-col items-center justify-center mt-20 sm:mt-32 text-gray-500">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 bg-[#1f1f1f] rounded-full flex items-center justify-center mb-4 border border-[#333]"><i class="fa-solid fa-satellite-dish text-3xl sm:text-4xl"></i></div>
+        <h2 class="text-lg sm:text-xl font-bold text-white mb-2">Henüz İçerik Yok</h2>
       </div>
     </div>
 
     <!-- 2. SHORTS GÖRÜNÜMÜ -->
     <div id="shortsView" class="hidden snap-container bg-black relative">
       <div id="shortsContainer" class="max-w-[450px] mx-auto h-full relative border-x border-[#272727]"></div>
-      <!-- Ana ekrana dön -->
       <button onclick="switchView('homeView')" class="fixed top-20 left-4 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center z-[60] hover:bg-black border border-white/20 shadow-lg">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
     </div>
 
     <!-- 3. VİDEO İZLEME GÖRÜNÜMÜ -->
-    <div id="watchView" class="hidden p-4 sm:p-6 max-w-[1600px] mx-auto transition-all duration-300">
+    <div id="watchView" class="hidden p-3 sm:p-6 max-w-[1600px] mx-auto transition-all duration-300 pb-16">
       <div class="flex flex-col lg:flex-row gap-6" id="watchLayout">
         
-        <!-- SOL SÜTUN: VİDEO VE YORUMLAR -->
+        <!-- SOL SÜTUN -->
         <div class="flex-1 lg:w-2/3 transition-all duration-300" id="videoPrimary">
-          <div class="bg-black rounded-2xl overflow-hidden aspect-video w-full shadow-2xl border border-[#272727] relative group" id="playerContainer">
+          <div class="bg-black rounded-xl sm:rounded-2xl overflow-hidden aspect-video w-full shadow-2xl border border-[#272727] relative group" id="playerContainer">
             <video id="player" controls autoplay class="w-full h-full object-contain"></video>
             <div class="absolute bottom-16 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
               <button onclick="toggleSpeed()" id="speedBtn" class="bg-black/70 text-white px-3 py-1 rounded-lg text-xs font-bold border border-white/20 hover:bg-black transition-colors"><i class="fa-solid fa-gauge-high"></i> 1x</button>
@@ -189,65 +208,43 @@
             </div>
           </div>
           
-          <h1 id="playerTitle" class="text-xl sm:text-2xl font-bold mt-4 mb-1 text-white"></h1>
-          <p class="text-sm text-gray-400 mb-3"><span id="playerViewsCount">0</span> Görüntülenme • <span id="playerDate"></span></p>
+          <h1 id="playerTitle" class="text-lg sm:text-2xl font-bold mt-4 mb-1 text-white"></h1>
+          <p class="text-xs sm:text-sm text-gray-400 mb-3"><span id="playerViewsCount">0</span> Görüntülenme • <span id="playerDate"></span></p>
           
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272727]">
             <div class="flex items-center gap-3 cursor-pointer group bg-[#121212] hover:bg-[#1f1f1f] p-2 rounded-xl transition-colors border border-transparent hover:border-[#333]" onclick="goToChannel(window.currentUploaderId)">
-              <img id="playerAvatar" src="" class="w-12 h-12 rounded-full object-cover border border-[#333] shadow-md">
-              <div><h3 id="playerChannelName" class="font-bold text-[16px] group-hover-theme-text transition-colors flex items-center gap-1 text-white"></h3><span id="playerSubCount" class="text-xs text-gray-400"></span></div>
-              <button id="subscribeBtn" onclick="event.stopPropagation(); toggleSubscribe()" class="ml-4 bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-bold border border-gray-300 transition-colors">Abone Ol</button>
+              <img id="playerAvatar" src="" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-[#333] shadow-md">
+              <div><h3 id="playerChannelName" class="font-bold text-sm sm:text-[16px] group-hover-theme-text transition-colors flex items-center gap-1 text-white"></h3><span id="playerSubCount" class="text-xs text-gray-400"></span></div>
+              <button id="subscribeBtn" onclick="event.stopPropagation(); toggleSubscribe()" class="ml-2 sm:ml-4 bg-white text-black hover:bg-gray-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold border border-gray-300 transition-colors">Abone Ol</button>
             </div>
 
-            <div class="flex items-center gap-2 flex-wrap justify-end">
-              <button id="likeBtn" onclick="toggleLike()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-regular fa-thumbs-up"></i> <span id="playerLikesCount">0</span></button>
-              <button onclick="shareVideo()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
-              <button id="saveBtn" onclick="toggleSave()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-sm font-bold text-white transition-colors"><i class="fa-regular fa-bookmark"></i> Kaydet</button>
-              <button id="editVidBtn" onclick="openEditModal()" class="hidden items-center gap-2 bg-[#272727] theme-text px-4 py-2 rounded-full text-sm font-bold transition-colors hover:bg-[#333]"><i class="fa-solid fa-pen-to-square"></i> Düzenle</button>
-              <button id="deleteVidBtn" onclick="deleteCurrentVideo()" class="hidden items-center gap-2 bg-red-900/30 text-red-400 hover:text-white hover:bg-red-600 px-4 py-2 rounded-full text-sm font-bold border border-red-500/30 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>
+            <div class="flex items-center gap-2 flex-wrap justify-start sm:justify-end">
+              <button id="likeBtn" onclick="toggleLike()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-regular fa-thumbs-up"></i> <span id="playerLikesCount">0</span></button>
+              <!-- Paylaş Butonu artık Doğrudan Menüyü Açar -->
+              <button onclick="openShareModal(window.currentVideoId)" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
+              <button id="saveBtn" onclick="toggleSave()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-regular fa-bookmark"></i> Kaydet</button>
+              <button id="editVidBtn" onclick="openEditModal()" class="hidden items-center gap-2 bg-[#272727] theme-text px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-colors hover:bg-[#333]"><i class="fa-solid fa-pen-to-square"></i> Düzenle</button>
+              <button id="deleteVidBtn" onclick="deleteCurrentVideo()" class="hidden items-center gap-2 bg-red-900/30 text-red-400 hover:text-white hover:bg-red-600 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold border border-red-500/30 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>
             </div>
           </div>
-          <div class="mt-4 bg-[#272727]/50 p-4 rounded-xl text-sm whitespace-pre-line text-gray-200"><p id="playerDescription"></p></div>
+          <div class="mt-4 bg-[#272727]/50 p-3 sm:p-4 rounded-xl text-xs sm:text-sm whitespace-pre-line text-gray-200"><p id="playerDescription"></p></div>
 
-          <!-- YORUMLAR (ANA VİDEO EKRANI) -->
+          <!-- YORUMLAR -->
           <div class="mt-8">
-            <h3 class="font-bold text-lg mb-4 text-white" id="commentCountTitle">Yorumlar</h3>
-            <div class="flex gap-3 mb-6">
-              <img id="myCommentAvatar" src="" class="w-10 h-10 rounded-full object-cover border border-[#333]">
+            <h3 class="font-bold text-base sm:text-lg mb-4 text-white" id="commentCountTitle">Yorumlar</h3>
+            <div class="flex gap-2 sm:gap-3 mb-6">
+              <img id="myCommentAvatar" src="" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-[#333]">
               <div class="flex-1 flex flex-col items-end gap-2">
-                <textarea id="commentInput" placeholder="Düşüncelerini paylaş..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-sm transition-colors h-8 focus:h-16 text-white"></textarea>
-                <button onclick="postComment('watch')" class="theme-bg text-white px-5 py-2 rounded-full text-sm font-bold transition-colors">Yorum Yap</button>
+                <textarea id="commentInput" placeholder="Düşüncelerini paylaş..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-xs sm:text-sm transition-colors h-8 focus:h-16 text-white"></textarea>
+                <button onclick="postComment('watch')" class="theme-bg text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-colors">Yorum Yap</button>
               </div>
             </div>
             <div id="commentsList" class="flex flex-col gap-6"></div>
           </div>
         </div>
 
-        <!-- SAĞ SÜTUN: REKLAM VE ÖNERİLEN VİDEOLAR -->
+        <!-- SAĞ SÜTUN -->
         <div class="w-full lg:w-[400px] xl:w-[450px] flex flex-col gap-3 transition-all duration-300">
-          
-          <!-- ADSTERRA REKLAM ALANI (300x250) -->
-          <div class="w-full p-3 mb-2 bg-[#181818] border border-[#272727] rounded-2xl flex flex-col items-center justify-center overflow-hidden shadow-lg">
-            <span class="text-[10px] text-gray-500 mb-2 uppercase tracking-widest font-bold">Sponsorlu Bağlantı</span>
-            <div class="flex justify-center items-center w-full min-h-[250px]">
-              
-              <!-- KULLANICININ REKLAM KODU -->
-              <script>
-                atOptions = {
-                  'key' : '655b9357ee699cfd4f2c1e6781d58616',
-                  'format' : 'iframe',
-                  'height' : 250,
-                  'width' : 300,
-                  'params' : {}
-                };
-              </script>
-              <script src="https://bicea.org/22/655b9357ee699cfd4f2c1e6781d58616"></script>
-              <!-- KOD SONU -->
-              
-            </div>
-          </div>
-
-          <!-- ÖNERİLEN VİDEOLAR LİSTESİ -->
           <div id="recommendationGrid" class="flex flex-col gap-3"></div>
         </div>
 
@@ -255,25 +252,32 @@
     </div>
 
     <!-- 4. KANAL GÖRÜNÜMÜ -->
-    <div id="channelView" class="hidden min-h-full">
-      <div id="channelBanner" class="w-full h-32 sm:h-48 md:h-64 bg-[#1f1f1f] bg-cover bg-center border-b border-[#333]"></div>
-      <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 -mt-12 sm:-mt-16 mb-8 relative z-10">
-          <img id="cvAvatar" src="" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-[#0f0f0f] bg-[#1f1f1f] shadow-xl">
-          <div class="mt-2 sm:mt-16 flex-1 text-center sm:text-left"><h1 id="cvName" class="text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1><p id="cvStats" class="text-gray-400 text-sm mt-1"></p></div>
-          <div class="sm:mt-16"><button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-6 py-2.5 rounded-full font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button></div>
+    <div id="channelView" class="hidden min-h-full pb-16">
+      <div id="channelBanner" class="w-full h-28 sm:h-48 md:h-64 bg-[#1f1f1f] bg-cover bg-center border-b border-[#333]"></div>
+      <div class="max-w-[1280px] mx-auto px-3 sm:px-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 -mt-10 sm:-mt-16 mb-6 sm:mb-8 relative z-10">
+          <img id="cvAvatar" src="" class="w-24 h-24 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-[#0f0f0f] bg-[#1f1f1f] shadow-xl">
+          <div class="mt-1 sm:mt-16 flex-1 text-center sm:text-left">
+            <h1 id="cvName" class="text-2xl sm:text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 text-white"></h1>
+            <p id="cvStats" class="text-gray-400 text-xs sm:text-sm mt-1 cursor-pointer hover:text-white hover:underline transition-colors" title="Aboneleri Göster" onclick="if(currentChannelViewId) openSubscribersList(currentChannelViewId)"></p>
+          </div>
+          <div class="sm:mt-16 flex gap-2">
+            <!-- MESAJ GÖNDER BUTONU -->
+            <button id="cvMessageBtn" onclick="startChatFromChannel()" class="hidden bg-[#272727] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-[#333] transition-colors hover:bg-[#3f3f3f]" title="Mesaj Gönder"><i class="fa-solid fa-envelope"></i></button>
+            <button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button>
+          </div>
         </div>
         <div class="border-b border-[#272727] mb-6 flex gap-6">
-          <button id="tabVideosBtn" onclick="switchChannelTab('videos')" class="px-2 py-3 border-b-2 font-bold theme-text" style="border-color: var(--theme-main)">Videolar</button>
-          <button id="tabCommunityBtn" onclick="switchChannelTab('community')" class="px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors">Topluluk</button>
+          <button id="tabVideosBtn" onclick="switchChannelTab('videos')" class="px-2 py-3 border-b-2 font-bold theme-text text-sm sm:text-base" style="border-color: var(--theme-main)">Videolar</button>
+          <button id="tabCommunityBtn" onclick="switchChannelTab('community')" class="px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors text-sm sm:text-base">Topluluk</button>
         </div>
         
         <div id="cvVideoGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10"></div>
         <div id="cvCommunityArea" class="hidden max-w-2xl mx-auto pb-10 flex flex-col gap-6">
-          <div id="createPostBox" class="hidden bg-[#181818] border border-[#272727] p-4 rounded-2xl flex flex-col gap-3">
-            <h4 class="font-bold text-sm text-white"><i class="fa-solid fa-bullhorn theme-text mr-2"></i>Topluluk Gönderisi Paylaş</h4>
-            <textarea id="postContentInput" placeholder="Abonelerinle bir duyuru, düşünce veya soru paylaş..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none resize-none h-24 theme-border text-white"></textarea>
-            <div class="flex justify-end"><button onclick="publishCommunityPost()" class="theme-bg text-white px-5 py-2 rounded-full text-sm font-bold transition-transform hover:scale-105">Paylaş</button></div>
+          <div id="createPostBox" class="hidden bg-[#181818] border border-[#272727] p-3 sm:p-4 rounded-2xl flex flex-col gap-3">
+            <h4 class="font-bold text-xs sm:text-sm text-white"><i class="fa-solid fa-bullhorn theme-text mr-2"></i>Topluluk Gönderisi Paylaş</h4>
+            <textarea id="postContentInput" placeholder="Abonelerinle bir duyuru, düşünce veya soru paylaş..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-xs sm:text-sm outline-none resize-none h-24 theme-border text-white"></textarea>
+            <div class="flex justify-end"><button onclick="publishCommunityPost()" class="theme-bg text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-transform hover:scale-105">Paylaş</button></div>
           </div>
           <div id="communityPostsList" class="flex flex-col gap-4"></div>
         </div>
@@ -281,138 +285,197 @@
     </div>
 
     <!-- 5. AYARLAR GÖRÜNÜMÜ -->
-    <div id="settingsView" class="hidden max-w-3xl mx-auto p-6 min-h-full">
-      <h2 class="text-2xl font-bold mb-6 border-b border-[#272727] pb-4 text-white"><i class="fa-solid fa-gear theme-text mr-2"></i> Ayarlar & Özelleştirme</h2>
-      <div class="bg-[#181818] border border-[#272727] p-6 sm:p-8 rounded-2xl flex flex-col gap-8 shadow-xl">
+    <div id="settingsView" class="hidden max-w-3xl mx-auto p-4 sm:p-6 min-h-full pb-16">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 border-b border-[#272727] pb-4 text-white"><i class="fa-solid fa-gear theme-text mr-2"></i> Ayarlar & Özelleştirme</h2>
+      <div class="bg-[#181818] border border-[#272727] p-4 sm:p-8 rounded-2xl flex flex-col gap-6 sm:gap-8 shadow-xl">
         <div class="border-b border-[#333] pb-6">
-          <h3 class="font-bold text-lg mb-4 text-white">Vurgu Rengi</h3>
-          <div class="flex gap-4 mb-6">
-            <button onclick="changeColor('blue')" class="w-10 h-10 rounded-full bg-blue-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
-            <button onclick="changeColor('green')" class="w-10 h-10 rounded-full bg-green-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
-            <button onclick="changeColor('yellow')" class="w-10 h-10 rounded-full bg-yellow-500 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
-            <button onclick="changeColor('red')" class="w-10 h-10 rounded-full bg-red-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
-            <button onclick="changeColor('purple')" class="w-10 h-10 rounded-full bg-purple-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+          <h3 class="font-bold text-base sm:text-lg mb-3 sm:mb-4 text-white">Vurgu Rengi</h3>
+          <div class="flex gap-3 sm:gap-4 mb-6">
+            <button onclick="changeColor('blue')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('green')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('yellow')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('red')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
+            <button onclick="changeColor('purple')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 ring-2 ring-transparent hover:ring-gray-400 transition-all"></button>
           </div>
-          <h3 class="font-bold text-lg mb-4 text-white">Uygulama Görünümü</h3>
-          <div class="flex gap-4">
-            <button onclick="setTheme(false)" class="flex-1 bg-[#121212] border border-[#333] theme-border p-4 rounded-xl flex flex-col items-center gap-2 text-gray-300 transition-colors"><i class="fa-solid fa-moon text-2xl"></i><span class="font-bold">Karanlık</span></button>
-            <button onclick="setTheme(true)" class="flex-1 bg-[#f9fafb] border border-gray-300 theme-border p-4 rounded-xl flex flex-col items-center gap-2 text-gray-800 transition-colors"><i class="fa-solid fa-sun text-2xl"></i><span class="font-bold">Aydınlık</span></button>
+          <h3 class="font-bold text-base sm:text-lg mb-3 sm:mb-4 text-white">Uygulama Görünümü</h3>
+          <div class="flex gap-3 sm:gap-4">
+            <button onclick="setTheme(false)" class="flex-1 bg-[#121212] border border-[#333] theme-border p-3 sm:p-4 rounded-xl flex flex-col items-center gap-2 text-gray-300 transition-colors"><i class="fa-solid fa-moon text-xl sm:text-2xl"></i><span class="font-bold text-xs sm:text-base">Karanlık</span></button>
+            <button onclick="setTheme(true)" class="flex-1 bg-[#f9fafb] border border-gray-300 theme-border p-3 sm:p-4 rounded-xl flex flex-col items-center gap-2 text-gray-800 transition-colors"><i class="fa-solid fa-sun text-xl sm:text-2xl"></i><span class="font-bold text-xs sm:text-base">Aydınlık</span></button>
           </div>
         </div>
         <div>
-          <h3 class="font-bold text-lg mb-2 text-white">Profil Fotoğrafı</h3>
-          <div class="flex items-center gap-6 mt-4"><img id="setAvatarPreview" src="" class="w-24 h-24 rounded-full object-cover border-2 border-[#333]"><input type="file" id="setAvatarFile" accept="image/*" class="text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
+          <h3 class="font-bold text-base sm:text-lg mb-2 text-white">Profil Fotoğrafı</h3>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-4"><img id="setAvatarPreview" src="" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-[#333]"><input type="file" id="setAvatarFile" accept="image/*" class="text-xs sm:text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
         </div>
         <div class="border-t border-[#333] pt-6">
-          <h3 class="font-bold text-lg mb-4 text-white">Kanal Arka Planı (Banner)</h3>
-          <div class="flex flex-col gap-4"><div id="setBannerPreview" class="w-full h-32 bg-[#121212] rounded-xl bg-cover bg-center border-2 border-[#333] shadow-inner"></div><input type="file" id="setBannerFile" accept="image/*" class="text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
+          <h3 class="font-bold text-base sm:text-lg mb-4 text-white">Kanal Arka Planı (Banner)</h3>
+          <div class="flex flex-col gap-4"><div id="setBannerPreview" class="w-full h-24 sm:h-32 bg-[#121212] rounded-xl bg-cover bg-center border-2 border-[#333] shadow-inner"></div><input type="file" id="setBannerFile" accept="image/*" class="text-xs sm:text-sm bg-[#121212] border border-[#333] p-2 rounded-lg w-full max-w-xs text-gray-400 cursor-pointer"></div>
         </div>
-        <div id="settingsProgress" class="hidden theme-progress p-4 rounded-xl text-sm flex items-center gap-3"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Kaydediliyor...</div>
-        <button onclick="saveSettings()" id="settingsSaveBtn" class="theme-bg text-white font-bold py-3.5 rounded-xl mt-2 theme-shadow transition-colors">Değişiklikleri Kaydet</button>
+        <div id="settingsProgress" class="hidden theme-progress p-4 rounded-xl text-xs sm:text-sm flex items-center gap-3"><i class="fa-solid fa-circle-notch fa-spin text-lg sm:text-xl"></i> Kaydediliyor...</div>
+        <button onclick="saveSettings()" id="settingsSaveBtn" class="theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl mt-2 theme-shadow transition-colors text-xs sm:text-base">Değişiklikleri Kaydet</button>
       </div>
     </div>
+
+    <!-- 6. MESAJLAR GÖRÜNÜMÜ -->
+    <div id="messagesView" class="hidden p-3 sm:p-6 max-w-[1200px] mx-auto min-h-full pb-16 h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] flex gap-4">
+      
+      <div id="chatSidebar" class="w-full sm:w-1/3 lg:w-1/4 bg-[#181818] border border-[#272727] rounded-2xl flex flex-col h-full overflow-hidden shadow-xl shrink-0 transition-all">
+         <div class="p-4 border-b border-[#333] font-bold text-white flex items-center justify-between gap-2 shrink-0">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope theme-text"></i> Mesajlar</span>
+         </div>
+         <div id="conversationList" class="flex-1 overflow-y-auto hide-scroll p-2 flex flex-col gap-1">
+             <div class="text-center text-gray-500 text-xs py-10">Sohbet yükleniyor...</div>
+         </div>
+      </div>
+
+      <div id="chatArea" class="hidden sm:flex flex-1 bg-[#181818] border border-[#272727] rounded-2xl flex-col h-full overflow-hidden shadow-xl relative transition-all">
+         
+         <div id="chatEmptyState" class="flex-1 flex flex-col items-center justify-center text-gray-500">
+            <i class="fa-solid fa-paper-plane text-4xl sm:text-5xl mb-3 opacity-50"></i>
+            <p class="text-sm sm:text-base font-medium">Bir sohbet seçin veya kanaldan mesaj gönderin.</p>
+         </div>
+
+         <div id="chatActiveState" class="hidden flex-col h-full">
+           <div class="p-3 sm:p-4 border-b border-[#333] flex items-center gap-3 bg-[#121212] z-10 shrink-0 shadow-sm">
+             <button onclick="closeChatMobile()" class="sm:hidden text-white w-8 h-8 rounded-full hover:bg-[#272727] transition-colors flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+             <img id="chatActiveAvatar" src="" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer border border-[#333]" onclick="if(activeChatUserId) goToChannel(activeChatUserId)">
+             <h3 id="chatActiveName" class="font-bold text-white text-sm sm:text-base cursor-pointer hover:underline" onclick="if(activeChatUserId) goToChannel(activeChatUserId)"></h3>
+           </div>
+           
+           <div id="chatMessagesBox" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 hide-scroll"></div>
+           
+           <div class="p-3 border-t border-[#333] bg-[#121212] flex gap-2 shrink-0 items-center">
+             <input type="text" id="chatInput" placeholder="Mesaj yaz..." class="flex-1 bg-transparent border border-[#3f3f3f] focus:border-blue-500 outline-none rounded-full px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white transition-colors" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+             <button onclick="sendChatMessage()" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full theme-bg text-white flex items-center justify-center transition-transform hover:scale-105 shrink-0"><i class="fa-solid fa-paper-plane text-xs sm:text-sm"></i></button>
+           </div>
+         </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ========================================= -->
   <!-- MODALLAR                                  -->
   <!-- ========================================= -->
   
-  <!-- SHORTS YORUM MODALI (TİKTOK STİLİ) -->
+  <!-- YENİ PAYLAŞIM / DM MODALI -->
+  <div id="shareModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-[#212121] border-t sm:border border-[#333] w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform h-[70vh] sm:max-h-[80vh]">
+        <div class="flex justify-between items-center p-4 border-b border-[#333] shrink-0">
+            <h3 class="font-bold text-white text-base"><i class="fa-solid fa-share-nodes theme-text mr-2"></i>Paylaş</h3>
+            <button onclick="closeModal('shareModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-4 border-b border-[#333] shrink-0">
+            <button id="copyLinkBtn" class="w-full flex items-center justify-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] text-white py-3 rounded-xl font-bold transition-colors text-sm">
+                <i class="fa-solid fa-link"></i> Bağlantıyı Kopyala
+            </button>
+        </div>
+        <div class="p-4 flex flex-col flex-1 min-h-0">
+            <h4 class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider">Arkadaşlarına DM Gönder</h4>
+            <div id="shareUsersList" class="flex-1 overflow-y-auto hide-scroll flex flex-col gap-1"></div>
+        </div>
+    </div>
+  </div>
+
+  <div id="subscribersModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#212121] border border-[#333] rounded-2xl sm:rounded-3xl w-full max-w-md relative flex flex-col shadow-2xl h-[75vh] sm:h-[70vh]">
+      <div class="flex justify-between items-center p-4 sm:p-5 border-b border-[#333] shrink-0">
+        <h3 class="font-bold text-white text-base sm:text-lg flex items-center gap-2"><i class="fa-solid fa-users theme-text"></i> <span id="subscribersCountTitle">Aboneler (0)</span></h3>
+        <button onclick="closeModal('subscribersModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-lg sm:text-xl"></i></button>
+      </div>
+      <div id="subscribersList" class="flex-1 overflow-y-auto p-3 sm:p-4 flex flex-col gap-2 hide-scroll"></div>
+    </div>
+  </div>
+
   <div id="shortsCommentModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-[#212121] sm:border border-[#333] w-full sm:max-w-lg h-[75vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform">
       <div class="flex justify-between items-center p-4 border-b border-[#333] shrink-0">
-        <h3 class="font-bold text-white" id="shortsCommentCountTitle">Yorumlar</h3>
-        <button onclick="closeModal('shortsCommentModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
+        <h3 class="font-bold text-white text-sm sm:text-base" id="shortsCommentCountTitle">Yorumlar</h3>
+        <button onclick="closeModal('shortsCommentModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-lg sm:text-xl"></i></button>
       </div>
       <div id="shortsCommentList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-6 hide-scroll"></div>
-      <div class="p-4 border-t border-[#333] bg-[#181818] shrink-0 flex items-end gap-3 sm:rounded-b-3xl">
-         <img id="shortsMyCommentAvatar" src="" class="w-9 h-9 rounded-full object-cover border border-[#333]">
-         <textarea id="shortsCommentInput" placeholder="Yorum ekle..." class="flex-1 bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-2 text-sm text-white h-10 focus:h-16 transition-all"></textarea>
-         <button onclick="postComment('shorts')" class="theme-text font-bold text-sm px-2 py-2">Gönder</button>
+      <div class="p-3 sm:p-4 border-t border-[#333] bg-[#181818] shrink-0 flex items-end gap-2 sm:gap-3 sm:rounded-b-3xl">
+         <img id="shortsMyCommentAvatar" src="" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-[#333]">
+         <textarea id="shortsCommentInput" placeholder="Yorum ekle..." class="flex-1 bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1.5 sm:py-2 text-xs sm:text-sm text-white h-9 sm:h-10 focus:h-14 sm:focus:h-16 transition-all"></textarea>
+         <button onclick="postComment('shorts')" class="theme-text font-bold text-xs sm:text-sm px-2 py-2">Gönder</button>
       </div>
     </div>
   </div>
 
-  <!-- AUTH MODAL -->
-  <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="glass p-8 rounded-3xl w-full max-w-sm relative shadow-2xl overflow-hidden">
+  <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-sm relative shadow-2xl overflow-hidden">
       <button onclick="closeModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full transition-colors"><i class="fa-solid fa-xmark"></i></button>
-      <div class="flex flex-col items-center mb-6"><div class="w-12 h-12 theme-bg rounded-xl flex items-center justify-center mb-3 shadow-lg"><i class="fa-solid fa-play text-white text-xl"></i></div><h3 id="authTitle" class="text-2xl font-bold text-white">Hoş Geldin</h3><p id="authSubtitle" class="text-xs text-gray-400 mt-1">Devam etmek için giriş yap</p></div>
-      <div class="flex flex-col gap-4 relative z-10">
-        <input type="email" id="authEmail" placeholder="E-posta" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3.5 text-sm outline-none text-white transition-colors">
-        <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3.5 text-sm outline-none text-white transition-colors">
-        <button onclick="handleAuth()" id="authBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-2 transition-colors shadow-lg">Giriş Yap</button>
-        <p class="text-sm text-gray-400 text-center mt-2 cursor-pointer transition-colors" onclick="toggleForgotPassword()" id="forgotPassText">Şifreni mi unuttun? <span class="theme-text font-bold">Sıfırla</span></p>
-        <p class="text-sm text-gray-400 text-center mt-1 cursor-pointer transition-colors" onclick="toggleAuthMode()" id="toggleAuthText">Hesabın yok mu? <span class="theme-text font-bold">Kayıt ol</span></p>
+      <div class="flex flex-col items-center mb-5 sm:mb-6"><div class="w-10 h-10 sm:w-12 sm:h-12 theme-bg rounded-xl flex items-center justify-center mb-2 sm:mb-3 shadow-lg"><i class="fa-solid fa-play text-white text-lg sm:text-xl"></i></div><h3 id="authTitle" class="text-xl sm:text-2xl font-bold text-white">Hoş Geldin</h3><p id="authSubtitle" class="text-xs text-gray-400 mt-1">Devam etmek için giriş yap</p></div>
+      <div class="flex flex-col gap-3.5 sm:gap-4 relative z-10">
+        <input type="email" id="authEmail" placeholder="E-posta" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm outline-none text-white transition-colors">
+        <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-[#121212]/80 border border-[#333] theme-border rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm outline-none text-white transition-colors">
+        <button onclick="handleAuth()" id="authBtn" class="w-full theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm mt-1 sm:mt-2 transition-colors shadow-lg">Giriş Yap</button>
+        <p class="text-xs sm:text-sm text-gray-400 text-center mt-2 cursor-pointer transition-colors" onclick="toggleForgotPassword()" id="forgotPassText">Şifreni mi unuttun? <span class="theme-text font-bold">Sıfırla</span></p>
+        <p class="text-xs sm:text-sm text-gray-400 text-center mt-1 cursor-pointer transition-colors" onclick="toggleAuthMode()" id="toggleAuthText">Hesabın yok mu? <span class="theme-text font-bold">Kayıt ol</span></p>
       </div>
     </div>
   </div>
 
-  <!-- KANAL OLUŞTUR MODAL -->
-  <div id="channelModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#212121] border border-[#333] p-8 rounded-3xl w-full max-w-md relative">
+  <div id="channelModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-md relative">
       <button onclick="closeModal('channelModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
-      <div class="text-center mb-6"><div class="w-16 h-16 bg-[#121212] rounded-full mx-auto flex items-center justify-center border border-[#333] mb-3"><i class="fa-solid fa-user-astronaut text-2xl theme-text"></i></div><h3 class="text-xl font-bold text-white">Kanalını Oluştur</h3><p class="text-sm text-gray-400 mt-1">Platforma katılmak için bir isim belirle.</p></div>
-      <div class="flex flex-col gap-4">
-        <input type="text" id="channelNameInput" placeholder="Örn: Oyun Günlüğüm" class="bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
-        <button onclick="createChannel()" class="theme-bg text-white font-bold py-3.5 rounded-xl text-sm transition-colors">Oluştur</button>
+      <div class="text-center mb-5 sm:mb-6"><div class="w-12 h-12 sm:w-16 sm:h-16 bg-[#121212] rounded-full mx-auto flex items-center justify-center border border-[#333] mb-3"><i class="fa-solid fa-user-astronaut text-xl sm:text-2xl theme-text"></i></div><h3 class="text-lg sm:text-xl font-bold text-white">Kanalını Oluştur</h3><p class="text-xs sm:text-sm text-gray-400 mt-1">Platforma katılmak için bir isim belirle.</p></div>
+      <div class="flex flex-col gap-3.5 sm:gap-4">
+        <input type="text" id="channelNameInput" placeholder="Örn: Oyun Günlüğüm" class="bg-[#121212] border border-[#303030] rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm outline-none theme-border text-white">
+        <button onclick="createChannel()" class="theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm transition-colors">Oluştur</button>
       </div>
     </div>
   </div>
 
-  <!-- VİDEO YÜKLE MODAL -->
-  <div id="uploadModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
+  <div id="uploadModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#212121] border border-[#333] p-5 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeModal('uploadModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-xl font-bold mb-6 text-white"><i class="fa-solid fa-cloud-arrow-up theme-text"></i> Video Yükle</h3>
-      <div class="flex flex-col lg:flex-row gap-6">
-        <div class="flex-1 flex flex-col gap-4">
-          <input type="text" id="upTitle" placeholder="Başlık *" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
-          <textarea id="upDesc" placeholder="Açıklama..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none h-20 resize-none theme-border text-white"></textarea>
-          <select id="upCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none theme-border text-white cursor-pointer">
+      <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white"><i class="fa-solid fa-cloud-arrow-up theme-text"></i> Video Yükle</h3>
+      <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
+        <div class="flex-1 flex flex-col gap-3 sm:gap-4">
+          <input type="text" id="upTitle" placeholder="Başlık *" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm outline-none theme-border text-white">
+          <textarea id="upDesc" placeholder="Açıklama..." class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-xs sm:text-sm outline-none h-16 sm:h-20 resize-none theme-border text-white"></textarea>
+          <select id="upCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-xs sm:text-sm outline-none theme-border text-white cursor-pointer">
             <option value="Oyun">Oyun</option><option value="Müzik">Müzik</option><option value="Eğitim">Eğitim</option><option value="Yazılım">Yazılım</option><option value="Eğlence">Eğlence</option>
           </select>
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Video (.mp4) *</label><input type="file" id="upFile" accept="video/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Kapak (Thumbnail)</label><input type="file" id="upThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Video (.mp4) *</label><input type="file" id="upFile" accept="video/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Kapak (Thumbnail)</label><input type="file" id="upThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
         </div>
-        <div class="w-full lg:w-64 flex flex-col gap-4">
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Önizleme</label><div id="videoPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Kapak</label><div id="thumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+        <div class="w-full lg:w-64 flex flex-col gap-3 sm:gap-4">
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Önizleme</label><div id="videoPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Kapak</label><div id="thumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-24 flex items-center justify-center overflow-hidden border-dashed"></div></div>
         </div>
       </div>
-      <div id="uploadProgress" class="hidden theme-progress p-3 rounded-xl text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Yükleniyor...</div>
-      <button onclick="uploadVideo()" id="uploadBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-4 transition-colors shadow-lg">Yayınla</button>
+      <div id="uploadProgress" class="hidden theme-progress p-3 rounded-xl text-xs sm:text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-lg sm:text-xl"></i> Yükleniyor...</div>
+      <button onclick="uploadVideo()" id="uploadBtn" class="w-full theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm mt-4 transition-colors shadow-lg">Yayınla</button>
     </div>
   </div>
 
-  <!-- VİDEO DÜZENLE MODAL -->
-  <div id="editModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#212121] border border-[#333] p-6 sm:p-8 rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
+  <div id="editModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#212121] border border-[#333] p-5 sm:p-8 rounded-2xl sm:rounded-3xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeModal('editModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-xl font-bold mb-6 text-white"><i class="fa-solid fa-pen-to-square theme-text"></i> Düzenle</h3>
-      <div class="flex flex-col lg:flex-row gap-6">
-        <div class="flex-1 flex flex-col gap-4">
-          <input type="text" id="editTitle" placeholder="Başlık" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3.5 text-sm outline-none theme-border text-white">
-          <textarea id="editDesc" placeholder="Açıklama" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none h-24 resize-none theme-border text-white"></textarea>
-          <select id="editCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-sm outline-none theme-border text-white cursor-pointer">
+      <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white"><i class="fa-solid fa-pen-to-square theme-text"></i> Düzenle</h3>
+      <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
+        <div class="flex-1 flex flex-col gap-3 sm:gap-4">
+          <input type="text" id="editTitle" placeholder="Başlık" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm outline-none theme-border text-white">
+          <textarea id="editDesc" placeholder="Açıklama" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-xs sm:text-sm outline-none h-20 sm:h-24 resize-none theme-border text-white"></textarea>
+          <select id="editCategory" class="w-full bg-[#121212] border border-[#303030] rounded-xl p-3 text-xs sm:text-sm outline-none theme-border text-white cursor-pointer">
             <option value="Oyun">Oyun</option><option value="Müzik">Müzik</option><option value="Eğitim">Eğitim</option><option value="Yazılım">Yazılım</option><option value="Eğlence">Eğlence</option>
           </select>
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Yeni Kapak Fotoğrafı (Opsiyonel)</label><input type="file" id="editThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Yeni Kapak Fotoğrafı (Opsiyonel)</label><input type="file" id="editThumb" accept="image/*" class="bg-[#121212] border border-[#303030] rounded-xl p-2 w-full text-xs text-gray-400 cursor-pointer"></div>
         </div>
-        <div class="w-full lg:w-64 flex flex-col gap-4">
-          <div><label class="text-xs font-bold text-gray-400 block mb-1">Mevcut / Yeni Kapak Önizlemesi</label><div id="editThumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-32 flex items-center justify-center overflow-hidden border-dashed"></div></div>
+        <div class="w-full lg:w-64 flex flex-col gap-3 sm:gap-4">
+          <div><label class="text-[11px] sm:text-xs font-bold text-gray-400 block mb-1">Mevcut / Yeni Kapak</label><div id="editThumbPreviewArea" class="bg-[#121212] border border-[#303030] rounded-xl h-28 sm:h-32 flex items-center justify-center overflow-hidden border-dashed"></div></div>
         </div>
       </div>
-      <div id="editProgress" class="hidden theme-progress p-3 rounded-xl text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i> Güncelleniyor...</div>
-      <button onclick="saveVideoEdit()" id="editSaveBtn" class="w-full theme-bg text-white font-bold py-3.5 rounded-xl text-sm mt-4 transition-colors shadow-lg">Kaydet</button>
+      <div id="editProgress" class="hidden theme-progress p-3 rounded-xl text-xs sm:text-sm flex items-center gap-3 mt-4"><i class="fa-solid fa-circle-notch fa-spin text-lg sm:text-xl"></i> Güncelleniyor...</div>
+      <button onclick="saveVideoEdit()" id="editSaveBtn" class="w-full theme-bg text-white font-bold py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm mt-4 transition-colors shadow-lg">Kaydet</button>
     </div>
   </div>
 
-  <div id="toastContainer" class="fixed bottom-6 right-6 bg-[#212121] border border-[#333] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[60]">
-    <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
-    <span id="toastMsg" class="font-bold text-sm"></span>
+  <div id="toastContainer" class="fixed bottom-6 right-6 bg-[#212121] border border-[#333] text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[60]">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base sm:text-lg"></i>
+    <span id="toastMsg" class="font-bold text-xs sm:text-sm"></span>
   </div>
 
   <!-- ========================================= -->
@@ -445,8 +508,15 @@
     let isRegisterMode = false; 
     let isForgotMode = false; 
     let allVideos = []; 
+    let allUsers = []; 
+    
+    let allMessages = [];
+    let activeChatUserId = null;
+    let messagesUnsub = null;
+
     window.currentVideoId = null; 
     window.currentUploaderId = null; 
+    window.currentShareVideoId = null; // YENİ: Paylaşılacak videonun ID'si
     let currentVideoData = null; 
     let currentChannelViewId = null;
     let viewedVideos = new Set(); 
@@ -454,15 +524,15 @@
     const isAdmin = () => currentUser && ADMIN_EMAILS.includes(currentUser.email);
     const getAv = (d) => d?.avatarUrl || `https://via.placeholder.com/150/1f1f1f/ffffff?text=${(d?.channelName || 'U').charAt(0).toUpperCase()}`;
     const getBn = (d) => d?.bannerUrl || `https://via.placeholder.com/1200x300/121212/333333?text=VidWave+Kanal`;
-    const getTh = (v) => v.thumbnailUrl || `https://via.placeholder.com/640x360/1f1f1f/555555?text=VidWave`;
+    const getTh = (v) => v?.thumbnailUrl || `https://via.placeholder.com/640x360/1f1f1f/555555?text=VidWave`;
     const getBdge = (e) => ADMIN_EMAILS.includes(e) ? `<i class="fa-solid fa-circle-check theme-text text-xs ml-1" title="Kurucu / Mod"></i>` : "";
 
     let toastTimeout; 
     window.showToast = (msg, type = "success") => {
       const tc = document.getElementById("toastContainer"); const ic = document.getElementById("toastIcon"); 
       tc.querySelector('span').textContent = msg;
-      if(type === "success") { ic.className = "fa-solid fa-circle-check text-green-400 text-lg"; tc.style.borderColor = "#4ade8055"; } 
-      else { ic.className = "fa-solid fa-circle-exclamation text-red-400 text-lg"; tc.style.borderColor = "#f8717155"; }
+      if(type === "success") { ic.className = "fa-solid fa-circle-check text-green-400 text-base sm:text-lg"; tc.style.borderColor = "#4ade8055"; } 
+      else { ic.className = "fa-solid fa-circle-exclamation text-red-400 text-base sm:text-lg"; tc.style.borderColor = "#f8717155"; }
       tc.classList.add("show"); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => tc.classList.remove("show"), 3000);
     };
 
@@ -491,7 +561,63 @@
     window.toggleLoop = () => { const player = document.getElementById("player"); const loopBtn = document.getElementById("loopBtn"); player.loop = !player.loop; if(player.loop) { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Açık`; loopBtn.classList.add("theme-text"); showToast("Döngü açıldı"); } else { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Kapalı`; loopBtn.classList.remove("theme-text"); showToast("Döngü kapatıldı"); } };
     window.toggleCinema = () => { const primary = document.getElementById("videoPrimary"); const layout = document.getElementById("watchLayout"); primary.classList.toggle("lg:w-2/3"); primary.classList.toggle("w-full"); layout.classList.toggle("flex-col"); showToast("Sinema Modu değiştirildi"); };
     window.togglePiP = async () => { try { if(document.pictureInPictureElement) await document.exitPictureInPicture(); else await document.getElementById('player').requestPictureInPicture(); } catch(e){ showToast("Mini oynatıcı bu tarayıcıda desteklenmiyor", "error"); } };
-    window.shareVideo = () => { navigator.clipboard.writeText(`https://vidwave.app/watch?v=${window.currentVideoId}`); showToast("Video linki kopyalandı!"); };
+    
+    // YENİ PAYLAŞIM FONKSİYONU
+    window.openShareModal = (videoId) => {
+        window.currentShareVideoId = videoId;
+        const listEl = document.getElementById("shareUsersList");
+        listEl.innerHTML = "";
+
+        if (!currentUser || !myChannelData) {
+            listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Kullanıcılara DM göndermek için giriş yapmalısın.</p>`;
+        } else {
+            // Kendimiz hariç herkesi göster
+            const shareableUsers = allUsers.filter(u => u.id !== currentUser.uid);
+            if(shareableUsers.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Gönderilecek kimse bulunamadı.</p>`;
+            } else {
+                shareableUsers.forEach(u => {
+                    listEl.innerHTML += `
+                        <div class="flex items-center justify-between p-2 hover:bg-[#333] rounded-xl cursor-pointer transition-colors" onclick="sendVideoToUser('${u.id}')">
+                            <div class="flex items-center gap-3">
+                                <img src="${getAv(u)}" class="w-10 h-10 rounded-full object-cover border border-[#333]">
+                                <span class="font-bold text-sm text-white">${u.channelName}</span>
+                            </div>
+                            <button class="bg-[#272727] hover:bg-blue-600 text-white text-xs px-4 py-2 rounded-full font-bold transition-colors">Gönder</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        document.getElementById("copyLinkBtn").onclick = () => {
+            navigator.clipboard.writeText(`https://vidwave.app/watch?v=${videoId}`);
+            showToast("Video linki kopyalandı!");
+            closeModal("shareModal");
+        };
+
+        openModal('shareModal');
+    };
+
+    window.sendVideoToUser = async (targetUserId) => {
+        if(!currentUser) return;
+        const text = `Bu videoya kesin bakmalısın! https://vidwave.app/watch?v=${window.currentShareVideoId}`;
+        try {
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                receiverId: targetUserId,
+                participants: [currentUser.uid, targetUserId],
+                text: text,
+                createdAt: Date.now(),
+                read: false
+            });
+            showToast("Video DM olarak gönderildi!");
+            closeModal("shareModal");
+        } catch(e) {
+            showToast("Gönderilemedi!", "error");
+            console.error(e);
+        }
+    };
 
     let shortsObserver = null;
     window.setupShortsObserver = () => {
@@ -510,7 +636,7 @@
     };
 
     window.switchView = (viewId, title = "") => {
-      ['homeView', 'watchView', 'channelView', 'settingsView', 'shortsView'].forEach(v => { document.getElementById(v).classList.add('hidden'); });
+      ['homeView', 'watchView', 'channelView', 'settingsView', 'shortsView', 'messagesView'].forEach(v => { document.getElementById(v).classList.add('hidden'); });
       document.getElementById(viewId).classList.remove('hidden'); 
       if(viewId !== 'watchView') document.getElementById('player').pause();
       if(viewId !== 'shortsView') document.querySelectorAll('.snap-item video').forEach(v => v.pause());
@@ -518,6 +644,7 @@
       const homeTitleEl = document.getElementById("homeTitle"); 
       if(viewId === 'homeView' && title) { homeTitleEl.innerHTML = title; homeTitleEl.classList.remove("hidden"); } else { homeTitleEl.classList.add("hidden"); }
       if(viewId === 'shortsView') renderShorts(); 
+      if(viewId === 'messagesView') renderConversationList(); 
       window.scrollTo(0,0);
     };
 
@@ -545,6 +672,9 @@
         document.getElementById("userSection").classList.remove("hidden"); document.getElementById("guestSection").classList.add("hidden");
         const modHtml = isAdmin() ? " <span class='theme-text font-bold'>(Kurucu)</span>" : "";
         document.getElementById("dropEmail").innerHTML = user.email + modHtml;
+        
+        startListeningMessages();
+
         const docSnap = await getDoc(doc(db, "users", user.uid));
         if (docSnap.exists()) {
           myChannelData = docSnap.data(); myChannelData.email = user.email;
@@ -554,8 +684,244 @@
           document.getElementById("setBannerPreview").style.backgroundImage = `url(${getBn(myChannelData)})`; document.getElementById("dropName").innerHTML = myChannelData.channelName + getBdge(user.email);
           renderNotifs(myChannelData.notifications || []);
         } else { myChannelData = null; document.getElementById("createChannelBtn").classList.remove("hidden"); document.getElementById("uploadVideoBtn").classList.add("hidden"); }
-      } else { document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; }
+      } else { 
+        document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; 
+        if(messagesUnsub) messagesUnsub(); 
+      }
     });
+
+    // === MESAJLAŞMA (DM) SİSTEMİ ===
+
+    function startListeningMessages() {
+      if(!currentUser) return;
+      if(messagesUnsub) messagesUnsub();
+      
+      const q = query(collection(db, "messages"), where("participants", "array-contains", currentUser.uid));
+      messagesUnsub = onSnapshot(q, (snap) => {
+          let msgs = [];
+          snap.forEach(d => msgs.push({id: d.id, ...d.data()}));
+          msgs.sort((a, b) => a.createdAt - b.createdAt); 
+          allMessages = msgs;
+          
+          updateUnreadMessagesBadge();
+          if(!document.getElementById('messagesView').classList.contains('hidden')) {
+              renderConversationList();
+              if(activeChatUserId) renderActiveChat(activeChatUserId);
+          }
+      });
+    }
+
+    function updateUnreadMessagesBadge() {
+        const unreadMsgs = allMessages.filter(m => m.receiverId === currentUser.uid && !m.read);
+        const navBadge = document.getElementById("msgBadge");
+        const menuBadge = document.getElementById("msgMenuBadge");
+        if(unreadMsgs.length > 0) {
+            if(navBadge) navBadge.classList.remove("hidden");
+            if(menuBadge) { menuBadge.classList.remove("hidden"); menuBadge.textContent = unreadMsgs.length; }
+        } else {
+            if(navBadge) navBadge.classList.add("hidden");
+            if(menuBadge) menuBadge.classList.add("hidden");
+        }
+    }
+
+    window.openMessagesView = () => {
+        if(!myChannelData) return showToast("Mesajlaşmak için kanal oluşturmalısın!", "error");
+        switchView('messagesView');
+    };
+
+    window.startChatFromChannel = () => {
+        if(!myChannelData) return showToast("Mesaj atmak için kanal oluşturmalısın.", "error");
+        if(currentChannelViewId === currentUser.uid) return;
+        
+        switchView('messagesView');
+        openChatWithUser(currentChannelViewId);
+    };
+
+    // YENİ: VİDEO LİNKLERİNİ TIKLANABİLİR ŞIK KARTLARA ÇEVİREN FONKSİYON
+    function formatMessageWithCards(text) {
+        let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        
+        // Linki algıla ve kart HTML'ine dönüştür
+        const urlRegex = /(https:\/\/vidwave\.app\/watch\?v=([a-zA-Z0-9_-]+))/g;
+        
+        return safeText.replace(urlRegex, (match, fullUrl, vId) => {
+            const linkedVid = allVideos.find(v => v.id === vId);
+            if (linkedVid) {
+                const safeTitle = (linkedVid.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
+                <div class="mt-2 w-48 sm:w-60 bg-[#121212] border border-[#3f3f3f] rounded-xl overflow-hidden cursor-pointer hover:border-gray-400 transition-all shadow-lg select-none" onclick="switchView('watchView'); setTimeout(() => playVideo('${linkedVid.id}', allVideos.find(v=>v.id==='${linkedVid.id}')), 100)">
+                    <div class="w-full aspect-video bg-black relative">
+                        <img src="${getTh(linkedVid)}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-play text-white text-3xl drop-shadow-md"></i>
+                        </div>
+                    </div>
+                    <div class="p-2.5">
+                        <h4 class="text-xs font-bold text-white line-clamp-2 leading-snug">${safeTitle}</h4>
+                        <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-user-astronaut text-[9px]"></i> ${linkedVid.channelName}</p>
+                    </div>
+                </div>`;
+            }
+            return `<a href="${match}" target="_blank" class="underline text-blue-300 hover:text-blue-200 break-all">${match}</a>`;
+        });
+    }
+
+    function renderConversationList() {
+        const listEl = document.getElementById("conversationList");
+        listEl.innerHTML = "";
+        
+        const contactsMap = new Map();
+        
+        if(activeChatUserId && !allMessages.some(m => m.participants.includes(activeChatUserId))) {
+           const u = allUsers.find(x => x.id === activeChatUserId);
+           if(u) contactsMap.set(activeChatUserId, { user: u, lastMsg: null });
+        }
+
+        const sortedMsgsDesc = [...allMessages].reverse();
+        sortedMsgsDesc.forEach(msg => {
+            const otherUid = msg.senderId === currentUser.uid ? msg.receiverId : msg.senderId;
+            if(!contactsMap.has(otherUid)) {
+                const userObj = allUsers.find(u => u.id === otherUid) || { id: otherUid, channelName: "Kullanıcı" };
+                contactsMap.set(otherUid, { user: userObj, lastMsg: msg });
+            }
+        });
+
+        if(contactsMap.size === 0) {
+            listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Henüz bir sohbetin yok.</p>`;
+            return;
+        }
+
+        contactsMap.forEach((data, otherUid) => {
+            const u = data.user;
+            const m = data.lastMsg;
+            const isUnread = m && m.receiverId === currentUser.uid && !m.read;
+            
+            // Son mesaj video ise preview yazısı göster
+            let msgText = "Yeni sohbet başlatın";
+            if (m) {
+                if (m.text.includes("vidwave.app/watch?v=")) msgText = m.senderId === currentUser.uid ? "Sen bir video gönderdin" : "Bir video gönderdi";
+                else msgText = m.senderId === currentUser.uid ? `Sen: ${m.text}` : m.text;
+            }
+            
+            const card = document.createElement("div");
+            card.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${activeChatUserId === otherUid ? 'bg-[#333]' : 'hover:bg-[#272727]'} ${isUnread ? 'border-l-2 border-blue-500 bg-[#272727]/50' : 'border-l-2 border-transparent'}`;
+            card.onclick = () => openChatWithUser(otherUid);
+            card.innerHTML = `
+                <img src="${getAv(u)}" class="w-10 h-10 rounded-full object-cover border border-[#333] shrink-0">
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm text-white truncate ${isUnread ? 'text-white' : 'text-gray-200'}">${u.channelName} ${getBdge(u.email)}</h4>
+                    <p class="text-xs truncate ${isUnread ? 'font-bold text-gray-300' : 'text-gray-500'}">${msgText}</p>
+                </div>
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    window.openChatWithUser = (userId) => {
+        activeChatUserId = userId;
+        renderConversationList(); 
+        
+        if(window.innerWidth < 640) {
+            document.getElementById("chatSidebar").classList.add("hidden");
+            document.getElementById("chatArea").classList.remove("hidden");
+            document.getElementById("chatArea").classList.add("flex");
+        }
+
+        renderActiveChat(userId);
+    };
+
+    window.closeChatMobile = () => {
+        activeChatUserId = null;
+        renderConversationList();
+        document.getElementById("chatArea").classList.add("hidden");
+        document.getElementById("chatArea").classList.remove("flex");
+        document.getElementById("chatSidebar").classList.remove("hidden");
+    };
+
+    async function renderActiveChat(userId) {
+        document.getElementById("chatEmptyState").classList.add("hidden");
+        document.getElementById("chatActiveState").classList.remove("hidden");
+        document.getElementById("chatActiveState").classList.add("flex");
+
+        const targetUser = allUsers.find(u => u.id === userId) || { id: userId, channelName: "Kullanıcı" };
+        document.getElementById("chatActiveAvatar").src = getAv(targetUser);
+        document.getElementById("chatActiveName").innerHTML = targetUser.channelName + getBdge(targetUser.email);
+
+        const box = document.getElementById("chatMessagesBox");
+        box.innerHTML = "";
+
+        const chatMsgs = allMessages.filter(m => m.participants.includes(userId));
+        
+        let batchUpdates = [];
+        chatMsgs.forEach(m => {
+            if(m.receiverId === currentUser.uid && !m.read) {
+                batchUpdates.push(updateDoc(doc(db, "messages", m.id), { read: true }));
+            }
+        });
+        if(batchUpdates.length > 0) Promise.all(batchUpdates); 
+
+        if(chatMsgs.length === 0) {
+            box.innerHTML = `<div class="text-center text-xs text-gray-500 py-10">Burası biraz sessiz. İlk mesajı sen gönder!</div>`;
+        } else {
+            let lastDate = "";
+            chatMsgs.forEach(m => {
+                const isMe = m.senderId === currentUser.uid;
+                const msgDate = new Date(m.createdAt).toLocaleDateString();
+                const msgTime = new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if(lastDate !== msgDate) {
+                    box.innerHTML += `<div class="text-center text-[10px] text-gray-500 my-2">${msgDate}</div>`;
+                    lastDate = msgDate;
+                }
+
+                // Mesajı güvenli hale getir ve içinde video linki varsa karta dönüştür
+                const finalFormattedText = formatMessageWithCards(m.text);
+
+                const msgDiv = document.createElement("div");
+                msgDiv.className = `flex flex-col max-w-[85%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
+                msgDiv.innerHTML = `
+                    <div class="px-3 py-2 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-[#272727] text-gray-200 rounded-tl-sm'} text-xs sm:text-sm shadow-sm flex flex-col">
+                        ${finalFormattedText}
+                    </div>
+                    <span class="text-[9px] sm:text-[10px] text-gray-500 mt-1 flex items-center gap-1">
+                       ${msgTime} ${isMe ? (m.read ? '<i class="fa-solid fa-check-double text-blue-400"></i>' : '<i class="fa-solid fa-check text-gray-500"></i>') : ''}
+                    </span>
+                `;
+                box.appendChild(msgDiv);
+            });
+        }
+        
+        setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+        document.getElementById("chatInput").focus();
+    }
+
+    window.sendChatMessage = async () => {
+        if(!currentUser) return showToast("Giriş yapmalısın!", "error");
+        if(!activeChatUserId) return showToast("Sohbet seçilmedi!", "error");
+        
+        const input = document.getElementById("chatInput");
+        const text = input.value.trim();
+        if(!text) return;
+        
+        try {
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                receiverId: activeChatUserId,
+                participants: [currentUser.uid, activeChatUserId],
+                text: text,
+                createdAt: Date.now(),
+                read: false
+            });
+            input.value = "";
+            setTimeout(() => {
+                const box = document.getElementById("chatMessagesBox");
+                if(box) box.scrollTop = box.scrollHeight;
+            }, 100);
+        } catch(e) {
+            console.error("Mesaj Gönderme Hatası:", e);
+            showToast("Hata: " + e.message, "error");
+        }
+    };
 
     function renderNotifs(notifs) {
       const list = document.getElementById("notifList"); const badge = document.getElementById("notifBadge"); list.innerHTML = ""; 
@@ -605,8 +971,35 @@
     
     window.openSettings = () => switchView('settingsView'); 
     window.goToMyChannel = () => { if(currentUser && myChannelData) goToChannel(currentUser.uid); };
+    window.openMySubscribers = () => { if(currentUser) openSubscribersList(currentUser.uid); };
     window.openSavedVideos = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-bookmark theme-text mr-2"></i> Kaydedilen Videolar'); const savedList = myChannelData.savedVideos || []; renderVideoGrid(allVideos.filter(v => savedList.includes(v.id))); };
     window.openHistory = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-clock-rotate-left theme-text mr-2"></i> İzleme Geçmişi'); const historyList = myChannelData.history || []; const filteredVideos = allVideos.filter(v => historyList.includes(v.id)); filteredVideos.sort((a, b) => historyList.indexOf(b.id) - historyList.indexOf(a.id)); renderVideoGrid(filteredVideos); };
+
+    window.openSubscribersList = (userId) => {
+        const user = allUsers.find(u => u.id === userId);
+        if(!user) return;
+        
+        document.getElementById("subscribersCountTitle").textContent = `Aboneler (${(user.subscribers || []).length})`;
+        const listEl = document.getElementById("subscribersList");
+        listEl.innerHTML = "";
+        
+        if(!user.subscribers || user.subscribers.length === 0) {
+            listEl.innerHTML = `<p class="text-gray-500 text-xs sm:text-sm text-center py-6">Henüz abone yok.</p>`;
+        } else {
+            user.subscribers.forEach(subId => {
+                const subUser = allUsers.find(u => u.id === subId) || { id: subId, channelName: "Bilinmeyen Kullanıcı" };
+                listEl.innerHTML += `
+                <div class="flex items-center gap-3 p-2.5 sm:p-3 bg-[#181818] border border-[#272727] hover:border-gray-500 rounded-xl cursor-pointer transition-colors" onclick="closeModal('subscribersModal'); goToChannel('${subId}')">
+                    <img src="${getAv(subUser)}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-[#333]">
+                    <div>
+                        <h4 class="font-bold text-xs sm:text-sm text-white">${subUser.channelName} ${getBdge(subUser.email)}</h4>
+                        <p class="text-[11px] sm:text-xs text-gray-400">${(subUser.subscribers || []).length} Abone</p>
+                    </div>
+                </div>`;
+            });
+        }
+        openModal("subscribersModal");
+    };
 
     window.saveSettings = async () => {
       if(!currentUser) return; 
@@ -651,9 +1044,11 @@
     let currentCategoryFilter = "Tümü";
     window.filterCat = (catName) => {
       currentCategoryFilter = catName; 
+      document.getElementById("channelsGrid").classList.add("hidden");
+      document.getElementById("searchInput").value = ""; 
       document.querySelectorAll('.cat-btn').forEach(btn => { 
-          btn.className = "cat-btn bg-[#272727] hover:bg-[#333] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap border border-[#333]"; 
-          if(btn.textContent.includes(catName)) { btn.className = "cat-btn active bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap"; }
+          btn.className = "cat-btn bg-[#272727] hover:bg-[#333] text-white px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap border border-[#333]"; 
+          if(btn.textContent.includes(catName)) { btn.className = "cat-btn active bg-white text-black px-3.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap"; }
       });
       if(catName === "Trendler") { const trendingVideos = [...allVideos].sort((a,b) => (b.views || 0) - (a.views || 0)); renderVideoGrid(trendingVideos); } 
       else if(catName === "Tümü") { renderVideoGrid(allVideos); } 
@@ -661,14 +1056,66 @@
     };
     
     document.getElementById("searchInput").addEventListener("input", (e) => { 
-        const searchTerm = e.target.value.toLowerCase(); 
+        const searchTerm = e.target.value.toLowerCase().trim(); 
         if(document.getElementById('homeView').classList.contains('hidden')) switchView('homeView'); 
-        const searchResults = allVideos.filter(v => v.title.toLowerCase().includes(searchTerm) || v.channelName.toLowerCase().includes(searchTerm)); renderVideoGrid(searchResults); 
+        
+        if(!searchTerm) {
+            document.getElementById("channelsGrid").classList.add("hidden");
+            filterCat(currentCategoryFilter);
+            return;
+        }
+
+        const searchChannels = allUsers.filter(u => u.channelName && u.channelName.toLowerCase().includes(searchTerm));
+        const seenVideoIds = new Set();
+        const searchVideos = [];
+        for (let v of allVideos) {
+            const matchesTitle = v.title && v.title.toLowerCase().includes(searchTerm);
+            const matchesChannel = v.channelName && v.channelName.toLowerCase().includes(searchTerm);
+            if ((matchesTitle || matchesChannel) && !seenVideoIds.has(v.id)) {
+                seenVideoIds.add(v.id);
+                searchVideos.push(v);
+            }
+        }
+        
+        renderChannelsGrid(searchChannels);
+        renderVideoGrid(searchVideos); 
+    });
+
+    window.renderChannelsGrid = (channelsArray) => {
+        const cGrid = document.getElementById("channelsGrid");
+        const cList = document.getElementById("channelsList");
+        cList.innerHTML = "";
+        
+        if(channelsArray.length === 0) {
+            cGrid.classList.add("hidden");
+            return;
+        }
+        
+        cGrid.classList.remove("hidden");
+        channelsArray.forEach(user => {
+            const el = document.createElement("div");
+            el.className = "flex items-center gap-3 bg-[#181818] p-3 rounded-xl border border-[#272727] cursor-pointer hover:border-gray-500 transition-colors shadow-sm";
+            el.onclick = () => goToChannel(user.id);
+            el.innerHTML = `
+                <img src="${getAv(user)}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-[#333]">
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-xs sm:text-sm text-white truncate">${user.channelName} ${getBdge(user.email)}</h4>
+                    <p class="text-[11px] sm:text-xs text-gray-400">${(user.subscribers || []).length} Abone</p>
+                </div>`;
+            cList.appendChild(el);
+        });
+    };
+
+    onSnapshot(collection(db, "users"), (snapshot) => {
+      allUsers = [];
+      snapshot.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
     });
 
     onSnapshot(query(collection(db, "videos"), orderBy("createdAt", "desc")), async (snapshot) => {
-      allVideos = []; snapshot.forEach(docSnap => allVideos.push({ id: docSnap.id, ...docSnap.data() }));
-      if(!document.getElementById('homeView').classList.contains('hidden') && document.getElementById("homeTitle").classList.contains("hidden")) { filterCat(currentCategoryFilter); }
+      allVideos = []; 
+      snapshot.forEach(docSnap => allVideos.push({ id: docSnap.id, ...docSnap.data() }));
+      const sInput = document.getElementById("searchInput").value;
+      if(!document.getElementById('homeView').classList.contains('hidden') && document.getElementById("homeTitle").classList.contains("hidden") && !sInput) { filterCat(currentCategoryFilter); }
       if(!document.getElementById('channelView').classList.contains('hidden') && currentChannelViewId) { renderChannelVideos(currentChannelViewId); }
     });
 
@@ -684,17 +1131,17 @@
       videosArray.forEach(video => {
         const uploaderData = userDocsCache[video.uploaderId]; 
         const canDelete = currentUser && (currentUser.uid === video.uploaderId || isAdmin());
-        const card = document.createElement("div"); card.className = "cursor-pointer group flex flex-col gap-3 relative";
+        const card = document.createElement("div"); card.className = "cursor-pointer group flex flex-col gap-2.5 sm:gap-3 relative";
         
         card.innerHTML = `
-          ${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${video.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg flex items-center justify-center"><i class="fa-solid fa-trash text-sm"></i></button>` : ""}
-          <div class="aspect-video bg-[#181818] rounded-2xl overflow-hidden relative border border-[#272727] group-hover:border-gray-500 transition-all shadow-md"><img src="${getTh(video)}" class="w-full h-full object-cover"></div>
-          <div class="flex gap-3 px-1">
-            <img src="${getAv(uploaderData)}" class="w-10 h-10 rounded-full object-cover border border-[#333] hover:opacity-80" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">
-            <div class="flex-1">
-              <h4 class="font-bold text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${video.title}</h4>
-              <p class="text-[13px] text-gray-400 mt-1 hover:text-white" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">${video.channelName} ${getBdge(video.uploaderEmail)}</p>
-              <p class="text-xs text-gray-500">${video.views || 0} Görüntülenme • ${video.likedBy?.length || 0} Beğeni</p>
+          ${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${video.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs sm:text-sm"></i></button>` : ""}
+          <div class="aspect-video bg-[#181818] rounded-xl sm:rounded-2xl overflow-hidden relative border border-[#272727] group-hover:border-gray-500 transition-all shadow-md"><img src="${getTh(video)}" class="w-full h-full object-cover"></div>
+          <div class="flex gap-2.5 sm:gap-3 px-1">
+            <img src="${getAv(uploaderData)}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-[#333] hover:opacity-80 shrink-0" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">
+            <div class="flex-1 min-w-0">
+              <h4 class="font-bold text-xs sm:text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${video.title}</h4>
+              <p class="text-xs text-gray-400 mt-0.5 sm:mt-1 hover:text-white truncate" onclick="event.stopPropagation(); goToChannel('${video.uploaderId}')">${video.channelName} ${getBdge(video.uploaderEmail)}</p>
+              <p class="text-[11px] sm:text-xs text-gray-500">${video.views || 0} Görüntülenme • ${video.likedBy?.length || 0} Beğeni</p>
             </div>
           </div>`;
         card.onclick = () => playVideo(video.id, video, userDocsCache); grid.appendChild(card);
@@ -724,36 +1171,37 @@
             <div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none"></div>
             <div class="absolute bottom-6 left-4 right-16 text-white z-10 flex flex-col gap-2">
               <div class="flex items-center gap-3 cursor-pointer" onclick="goToChannel('${video.uploaderId}')">
-                <img src="${getAv(uData)}" class="w-9 h-9 rounded-full object-cover border border-white/30 shadow-md">
-                <span class="font-bold text-sm drop-shadow-md">@${video.channelName}</span>
+                <img src="${getAv(uData)}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-white/30 shadow-md">
+                <span class="font-bold text-xs sm:text-sm drop-shadow-md">@${video.channelName}</span>
               </div>
-              <h3 class="font-semibold text-sm drop-shadow-md line-clamp-2">${video.title}</h3>
+              <h3 class="font-semibold text-xs sm:text-sm drop-shadow-md line-clamp-2">${video.title}</h3>
             </div>
             
-            <div class="absolute bottom-6 right-4 flex flex-col gap-6 items-center z-10">
+            <div class="absolute bottom-6 right-3 sm:right-4 flex flex-col gap-5 sm:gap-6 items-center z-10">
               <button onclick="toggleShortLike('${video.id}')" class="flex flex-col items-center gap-1 group">
-                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
-                   <i id="shortLikeIcon_${video.id}" class="${isLiked ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-2xl transition-colors"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i id="shortLikeIcon_${video.id}" class="${isLiked ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-xl sm:text-2xl transition-colors"></i>
                 </div>
-                <span class="text-xs text-white font-bold drop-shadow-md" id="shortLikeCount_${video.id}">${likesCount}</span>
+                <span class="text-[11px] sm:text-xs text-white font-bold drop-shadow-md" id="shortLikeCount_${video.id}">${likesCount}</span>
               </button>
               <button onclick="openShortsComments('${video.id}', '${video.uploaderId}')" class="flex flex-col items-center gap-1 group">
-                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
-                   <i class="fa-solid fa-comment-dots text-white text-2xl"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i class="fa-solid fa-comment-dots text-white text-xl sm:text-2xl"></i>
                 </div>
-                <span class="text-xs text-white font-bold drop-shadow-md">Yorum</span>
+                <span class="text-[11px] sm:text-xs text-white font-bold drop-shadow-md">Yorum</span>
               </button>
               <button onclick="toggleShortSave('${video.id}')" class="flex flex-col items-center gap-1 group">
-                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
-                   <i id="shortSaveIcon_${video.id}" class="${isSaved ? 'fa-solid theme-text' : 'fa-regular text-white'} fa-bookmark text-2xl transition-colors"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i id="shortSaveIcon_${video.id}" class="${isSaved ? 'fa-solid theme-text' : 'fa-regular text-white'} fa-bookmark text-xl sm:text-2xl transition-colors"></i>
                 </div>
-                <span class="text-xs text-white font-bold drop-shadow-md">Kaydet</span>
+                <span class="text-[11px] sm:text-xs text-white font-bold drop-shadow-md">Kaydet</span>
               </button>
-              <button onclick="shareShort('${video.id}')" class="flex flex-col items-center gap-1 group">
-                <div class="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
-                   <i class="fa-solid fa-share text-white text-2xl"></i>
+              <!-- Shorts Paylaş Butonu Doğrudan Menüyü Açar -->
+              <button onclick="openShareModal('${video.id}')" class="flex flex-col items-center gap-1 group">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
+                   <i class="fa-solid fa-share text-white text-xl sm:text-2xl"></i>
                 </div>
-                <span class="text-xs text-white font-bold drop-shadow-md">Paylaş</span>
+                <span class="text-[11px] sm:text-xs text-white font-bold drop-shadow-md">Paylaş</span>
               </button>
             </div>
           </div>`;
@@ -796,16 +1244,16 @@
             const rCanDelete = currentUser && (currentUser.uid === r.userId || isAdmin() || currentUser.uid === window.currentUploaderId);
             const rLikesCount = (r.likedBy || []).length; const rIsLiked = currentUser && (r.likedBy || []).includes(currentUser.uid);
             const rIsOwner = r.userId === window.currentUploaderId;
-            repliesHTML += `<div class="flex gap-3 pl-10 mt-3 pt-2 border-l-2 border-[#272727]"><img src="${getAv(rUserData)}" class="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80" onclick="goToChannel('${r.userId}')"><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="font-bold text-xs cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1" onclick="goToChannel('${r.userId}')">${rChannelName} ${getBdge(rUserData?.email)} ${rIsOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal">Kanal Sahibi</span>` : ""}</span><span class="text-[10px] text-gray-500">${new Date(r.createdAt).toLocaleDateString()}</span></div><p class="text-sm text-gray-200 whitespace-pre-line mb-2">${r.text}</p><div class="flex items-center gap-4 text-xs"><button onclick="toggleCommentLike('${r.id}')" class="flex items-center gap-1 font-bold ${rIsLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${rIsLiked ? 'solid' : 'regular'} fa-heart"></i> <span>${rLikesCount}</span></button>${rCanDelete ? `<button onclick="deleteComment('${r.id}')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>` : ""}</div></div></div>`;
+            repliesHTML += `<div class="flex gap-2.5 sm:gap-3 pl-8 sm:pl-10 mt-3 pt-2 border-l-2 border-[#272727]"><img src="${getAv(rUserData)}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover cursor-pointer hover:opacity-80" onclick="goToChannel('${r.userId}')"><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="font-bold text-xs cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1" onclick="goToChannel('${r.userId}')">${rChannelName} ${getBdge(rUserData?.email)} ${rIsOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal">Kanal Sahibi</span>` : ""}</span><span class="text-[10px] text-gray-500">${new Date(r.createdAt).toLocaleDateString()}</span></div><p class="text-xs sm:text-sm text-gray-200 whitespace-pre-line mb-2">${r.text}</p><div class="flex items-center gap-4 text-xs"><button onclick="toggleCommentLike('${r.id}')" class="flex items-center gap-1 font-bold ${rIsLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${rIsLiked ? 'solid' : 'regular'} fa-heart"></i> <span>${rLikesCount}</span></button>${rCanDelete ? `<button onclick="deleteComment('${r.id}')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>` : ""}</div></div></div>`;
           }
 
           el.innerHTML = `
-            <div class="flex gap-3"><img src="${getAv(userData)}" class="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80" onclick="goToChannel('${comment.userId}')">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1"><span class="font-bold text-sm cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1" onclick="goToChannel('${comment.userId}')">${channelName} ${getBdge(userData?.email)} ${isOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal">Kanal Sahibi</span>` : ""}</span><span class="text-xs text-gray-500">${new Date(comment.createdAt).toLocaleDateString()}</span></div>
-                <p class="text-sm text-gray-200 whitespace-pre-line mb-2">${comment.text}</p>
+            <div class="flex gap-2.5 sm:gap-3"><img src="${getAv(userData)}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer hover:opacity-80 shrink-0" onclick="goToChannel('${comment.userId}')">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1"><span class="font-bold text-xs sm:text-sm cursor-pointer text-white hover-theme-text transition-colors flex items-center gap-1 truncate" onclick="goToChannel('${comment.userId}')">${channelName} ${getBdge(userData?.email)} ${isOwner ? `<span class="bg-[#272727] theme-text text-[10px] px-1.5 py-0.5 rounded font-normal shrink-0">Kanal Sahibi</span>` : ""}</span><span class="text-[10px] sm:text-xs text-gray-500 shrink-0">${new Date(comment.createdAt).toLocaleDateString()}</span></div>
+                <p class="text-xs sm:text-sm text-gray-200 whitespace-pre-line mb-2">${comment.text}</p>
                 <div class="flex items-center gap-4 text-xs"><button onclick="toggleCommentLike('${comment.id}')" class="flex items-center gap-1 font-bold ${isLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${isLiked ? 'solid' : 'regular'} fa-heart"></i> <span>${likesCount}</span></button><button onclick="openReplyBox('${comment.id}', '@${channelName} ', '${context}')" class="font-bold text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-reply"></i> Yanıtla</button>${canDelete ? `<button onclick="deleteComment('${comment.id}')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>` : ""}</div>
-                <div id="replyBox_${context}_${comment.id}" class="hidden mt-3 flex flex-col gap-2 bg-[#181818] p-3 rounded-xl border border-[#333]"><textarea id="replyInput_${context}_${comment.id}" placeholder="Yanıtını yaz..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-sm text-white h-12"></textarea><div class="flex justify-end gap-2"><button onclick="closeReplyBox('${comment.id}', '${context}')" class="text-xs text-gray-400 hover:text-white px-3 py-1.5 transition-colors">İptal</button><button onclick="postReply('${comment.id}', '${context}')" class="theme-bg text-white px-4 py-1.5 rounded-full text-xs font-bold transition-colors">Yanıtla</button></div></div>
+                <div id="replyBox_${context}_${comment.id}" class="hidden mt-3 flex flex-col gap-2 bg-[#181818] p-3 rounded-xl border border-[#333]"><textarea id="replyInput_${context}_${comment.id}" placeholder="Yanıtını yaz..." class="w-full bg-transparent border-b border-[#3f3f3f] theme-border outline-none resize-none py-1 text-xs sm:text-sm text-white h-12"></textarea><div class="flex justify-end gap-2"><button onclick="closeReplyBox('${comment.id}', '${context}')" class="text-xs text-gray-400 hover:text-white px-3 py-1.5 transition-colors">İptal</button><button onclick="postReply('${comment.id}', '${context}')" class="theme-bg text-white px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-colors">Yanıtla</button></div></div>
                 <div class="replies-wrapper">${repliesHTML}</div>
               </div>
             </div>`;
@@ -843,8 +1291,8 @@
       if(!currentUser) return showToast("Beğenmek için giriş yapın.", "error"); 
       const videoRef = doc(db, "videos", id); const snap = await getDoc(videoRef); if(!snap.exists()) return;
       let likesList = snap.data().likedBy || []; const likeIcon = document.getElementById(`shortLikeIcon_${id}`); const likeCountText = document.getElementById(`shortLikeCount_${id}`);
-      if(likesList.includes(currentUser.uid)) { await updateDoc(videoRef, { likedBy: arrayRemove(currentUser.uid) }); likesList = likesList.filter(uid => uid !== currentUser.uid); if(likeIcon) likeIcon.className = "fa-regular fa-heart text-white text-2xl transition-colors"; } 
-      else { await updateDoc(videoRef, { likedBy: arrayUnion(currentUser.uid) }); likesList.push(currentUser.uid); if(likeIcon) likeIcon.className = "fa-solid fa-heart text-red-500 text-2xl transition-colors"; } 
+      if(likesList.includes(currentUser.uid)) { await updateDoc(videoRef, { likedBy: arrayRemove(currentUser.uid) }); likesList = likesList.filter(uid => uid !== currentUser.uid); if(likeIcon) likeIcon.className = "fa-regular fa-heart text-white text-xl sm:text-2xl transition-colors"; } 
+      else { await updateDoc(videoRef, { likedBy: arrayUnion(currentUser.uid) }); likesList.push(currentUser.uid); if(likeIcon) likeIcon.className = "fa-solid fa-heart text-red-500 text-xl sm:text-2xl transition-colors"; } 
       if(likeCountText) likeCountText.textContent = likesList.length;
       const vidObj = allVideos.find(v => v.id === id); if(vidObj) vidObj.likedBy = likesList;
     };
@@ -852,8 +1300,8 @@
     window.toggleShortSave = async (id) => {
       if(!myChannelData) return showToast("Kaydetmek için giriş yapıp kanal oluşturun.", "error"); 
       const userRef = doc(db, "users", currentUser.uid); let savedList = myChannelData.savedVideos || []; const saveIcon = document.getElementById(`shortSaveIcon_${id}`);
-      if(savedList.includes(id)) { await updateDoc(userRef, { savedVideos: arrayRemove(id) }); myChannelData.savedVideos = savedList.filter(vid => vid !== id); if(saveIcon) saveIcon.className = "fa-regular fa-bookmark text-white text-2xl transition-colors"; showToast("Kaydedilenlerden çıkarıldı"); } 
-      else { await updateDoc(userRef, { savedVideos: arrayUnion(id) }); myChannelData.savedVideos.push(id); if(saveIcon) saveIcon.className = "fa-solid fa-bookmark theme-text text-2xl transition-colors"; showToast("Video kaydedildi!"); } 
+      if(savedList.includes(id)) { await updateDoc(userRef, { savedVideos: arrayRemove(id) }); myChannelData.savedVideos = savedList.filter(vid => vid !== id); if(saveIcon) saveIcon.className = "fa-regular fa-bookmark text-white text-xl sm:text-2xl transition-colors showToast("Kaydedilenlerden çıkarıldı"); } 
+      else { await updateDoc(userRef, { savedVideos: arrayUnion(id) }); myChannelData.savedVideos.push(id); if(saveIcon) saveIcon.className = "fa-solid fa-bookmark theme-text text-xl sm:text-2xl transition-colors"; showToast("Video kaydedildi!"); } 
     };
 
     window.shareShort = (id) => { navigator.clipboard.writeText(`https://vidwave.app/watch?v=${id}`); showToast("Video linki kopyalandı!"); };
@@ -881,8 +1329,8 @@
 
       const recs = allVideos.filter(x => x.id !== videoId).slice(0, 8); const recGrid = document.getElementById("recommendationGrid"); recGrid.innerHTML = "";
       recs.forEach(recVid => { 
-          const el = document.createElement("div"); el.className = "flex gap-3 cursor-pointer group"; 
-          el.innerHTML = `<div class="w-40 aspect-video bg-[#181818] rounded-xl overflow-hidden flex-shrink-0 border border-[#272727]"><img src="${getTh(recVid)}" class="w-full h-full object-cover"></div><div class="flex-1 py-1 pr-2"><h4 class="font-bold text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${recVid.title}</h4><p class="text-xs text-gray-400 mt-1">${recVid.channelName}</p></div>`; 
+          const el = document.createElement("div"); el.className = "flex gap-2.5 sm:gap-3 cursor-pointer group"; 
+          el.innerHTML = `<div class="w-32 sm:w-40 aspect-video bg-[#181818] rounded-xl overflow-hidden flex-shrink-0 border border-[#272727]"><img src="${getTh(recVid)}" class="w-full h-full object-cover"></div><div class="flex-1 py-0.5 sm:py-1 pr-2 min-w-0"><h4 class="font-bold text-xs sm:text-sm leading-snug line-clamp-2 text-white group-hover-theme-text">${recVid.title}</h4><p class="text-[11px] sm:text-xs text-gray-400 mt-1 truncate">${recVid.channelName}</p></div>`; 
           el.onclick = () => playVideo(recVid.id, recVid); recGrid.appendChild(el); 
       });
       loadComments('watch');
@@ -924,32 +1372,36 @@
     
     function updateSubscribeUI(subsList, btnId) {
       const btn = document.getElementById(btnId);
-      if(currentUser && subsList.includes(currentUser.uid)) { btn.textContent = "Abone Olundu"; if(btnId === "cvSubBtn") btn.className = "bg-[#272727] text-white px-6 py-2.5 rounded-full font-bold border border-[#333]"; else btn.className = "ml-4 bg-[#272727] text-white px-4 py-2 rounded-full text-sm font-bold border border-gray-600"; } 
-      else { btn.textContent = "Abone Ol"; if(btnId === "cvSubBtn") btn.className = "bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-full font-bold border border-gray-300"; else btn.className = "ml-4 bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-bold border border-gray-300"; } 
+      if(currentUser && subsList.includes(currentUser.uid)) { btn.textContent = "Abone Olundu"; if(btnId === "cvSubBtn") btn.className = "bg-[#272727] text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold border border-[#333] text-xs sm:text-sm"; else btn.className = "ml-2 sm:ml-4 bg-[#272727] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold border border-gray-600"; } 
+      else { btn.textContent = "Abone Ol"; if(btnId === "cvSubBtn") btn.className = "bg-white text-black hover:bg-gray-200 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold border border-gray-300 text-xs sm:text-sm"; else btn.className = "ml-2 sm:ml-4 bg-white text-black hover:bg-gray-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold border border-gray-300"; } 
     }
 
     window.goToChannel = async (userId) => { 
       currentChannelViewId = userId; switchView('channelView'); switchChannelTab('videos');
       const snap = await getDoc(doc(db, "users", userId)); const userData = snap.exists() ? snap.data() : { channelName: 'Bilinmiyor', subscribers: [] };
       document.getElementById("channelBanner").style.backgroundImage = `url('${getBn(userData)}')`; document.getElementById("cvAvatar").src = getAv(userData); document.getElementById("cvName").innerHTML = userData.channelName + getBdge(userData.email); document.getElementById("cvStats").textContent = `${(userData.subscribers || []).length} Abone`;
+      
+      const msgBtn = document.getElementById("cvMessageBtn");
+      if(currentUser && currentUser.uid !== userId) msgBtn.classList.remove("hidden"); else msgBtn.classList.add("hidden");
+
       updateSubscribeUI(userData.subscribers || [], "cvSubBtn"); if(currentUser && currentUser.uid === userId) document.getElementById("cvSubBtn").classList.add("hidden"); else document.getElementById("cvSubBtn").classList.remove("hidden");
       renderChannelVideos(userId, userData); loadCommunityPosts(userId);
     };
 
     window.switchChannelTab = (tab) => {
       const vGrid = document.getElementById("cvVideoGrid"); const cArea = document.getElementById("cvCommunityArea"); const tVBtn = document.getElementById("tabVideosBtn"); const tCBtn = document.getElementById("tabCommunityBtn");
-      if(tab === 'videos') { vGrid.classList.remove("hidden"); cArea.classList.add("hidden"); tVBtn.className = "px-2 py-3 border-b-2 font-bold theme-text"; tVBtn.style.borderColor = "var(--theme-main)"; tCBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors"; tCBtn.style.borderColor = "transparent"; } 
-      else { vGrid.classList.add("hidden"); cArea.classList.remove("hidden"); tCBtn.className = "px-2 py-3 border-b-2 font-bold theme-text"; tCBtn.style.borderColor = "var(--theme-main)"; tVBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors"; tVBtn.style.borderColor = "transparent";
+      if(tab === 'videos') { vGrid.classList.remove("hidden"); cArea.classList.add("hidden"); tVBtn.className = "px-2 py-3 border-b-2 font-bold theme-text text-sm sm:text-base"; tVBtn.style.borderColor = "var(--theme-main)"; tCBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors text-sm sm:text-base"; tCBtn.style.borderColor = "transparent"; } 
+      else { vGrid.classList.add("hidden"); cArea.classList.remove("hidden"); tCBtn.className = "px-2 py-3 border-b-2 font-bold theme-text text-sm sm:text-base"; tCBtn.style.borderColor = "var(--theme-main)"; tVBtn.className = "px-2 py-3 border-b-2 font-bold text-gray-400 hover:text-white border-transparent transition-colors text-sm sm:text-base"; tVBtn.style.borderColor = "transparent";
         const postBox = document.getElementById("createPostBox"); if(currentUser && currentUser.uid === currentChannelViewId) { postBox.classList.remove("hidden"); } else { postBox.classList.add("hidden"); }
       }
     };
 
     function renderChannelVideos(userId, userData = null) { 
       const grid = document.getElementById("cvVideoGrid"); grid.innerHTML = ""; const userVideos = allVideos.filter(v => v.uploaderId === userId); 
-      if(userVideos.length === 0) { grid.innerHTML = `<p class="text-gray-500 py-10 col-span-full text-center">Bu kanalda henüz video bulunmuyor.</p>`; return; }
+      if(userVideos.length === 0) { grid.innerHTML = `<p class="text-gray-500 py-10 col-span-full text-center text-xs sm:text-sm">Bu kanalda henüz video bulunmuyor.</p>`; return; }
       userVideos.forEach(v => { 
         const canDelete = currentUser && (currentUser.uid === v.uploaderId || isAdmin()); const card = document.createElement("div"); card.className = "cursor-pointer group flex flex-col gap-2 relative"; 
-        card.innerHTML = `${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${v.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 z-10 flex items-center justify-center transition-opacity"><i class="fa-solid fa-trash text-sm"></i></button>` : ""}<div class="aspect-video bg-[#181818] rounded-xl overflow-hidden relative border border-[#272727]"><img src="${getTh(v)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"></div><div><h4 class="font-bold text-sm line-clamp-2 text-white group-hover-theme-text transition-colors">${v.title}</h4><p class="text-xs text-gray-400 mt-1">${v.views || 0} İzlenme • ${v.likedBy?.length || 0} Beğeni</p></div>`; 
+        card.innerHTML = `${canDelete ? `<button onclick="event.stopPropagation(); deleteVideo('${v.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full opacity-0 group-hover:opacity-100 z-10 flex items-center justify-center transition-opacity"><i class="fa-solid fa-trash text-xs sm:text-sm"></i></button>` : ""}<div class="aspect-video bg-[#181818] rounded-xl overflow-hidden relative border border-[#272727]"><img src="${getTh(v)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"></div><div><h4 class="font-bold text-xs sm:text-sm line-clamp-2 text-white group-hover-theme-text transition-colors">${v.title}</h4><p class="text-[11px] sm:text-xs text-gray-400 mt-1">${v.views || 0} İzlenme • ${v.likedBy?.length || 0} Beğeni</p></div>`; 
         card.onclick = () => playVideo(v.id, v, userData ? {[userId]: userData} : null); grid.appendChild(card); 
       }); 
     }
@@ -964,12 +1416,12 @@
       if(postUnsubListener) postUnsubListener(); const pQuery = query(collection(db, "posts"), where("channelId", "==", channelId));
       postUnsubListener = onSnapshot(pQuery, async (snap) => {
         const listEl = document.getElementById("communityPostsList"); listEl.innerHTML = ""; let posts = []; snap.forEach(d => posts.push({ id: d.id, ...d.data() })); posts.sort((a,b) => b.createdAt - a.createdAt);
-        if(posts.length === 0) { listEl.innerHTML = `<p class="text-gray-500 text-center py-10">Henüz topluluk gönderisi paylaşılmamış.</p>`; return; }
+        if(posts.length === 0) { listEl.innerHTML = `<p class="text-gray-500 text-center py-10 text-xs sm:text-sm">Henüz topluluk gönderisi paylaşılmamış.</p>`; return; }
         const userSnap = await getDoc(doc(db, "users", channelId)); const userData = userSnap.exists() ? userSnap.data() : null;
         posts.forEach(p => {
           const canDelete = currentUser && (currentUser.uid === p.channelId || isAdmin()); const isLiked = currentUser && (p.likedBy || []).includes(currentUser.uid); const likesCount = (p.likedBy || []).length;
-          const card = document.createElement("div"); card.className = "bg-[#181818] border border-[#272727] p-5 rounded-2xl flex flex-col gap-3 relative shadow-md";
-          card.innerHTML = `${canDelete ? `<button onclick="deleteCommunityPost('${p.id}')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash"></i></button>` : ""}<div class="flex items-center gap-3"><img src="${getAv(userData)}" class="w-10 h-10 rounded-full object-cover border border-[#333]"><div><h4 class="font-bold text-sm text-white">${userData?.channelName || 'Kanal'}</h4><p class="text-xs text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</p></div></div><p class="text-sm text-gray-200 whitespace-pre-line">${p.text}</p><div class="flex items-center gap-4 pt-2 border-t border-[#272727] text-xs"><button onclick="togglePostLike('${p.id}')" class="flex items-center gap-1.5 font-bold ${isLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${isLiked ? 'solid' : 'regular'} fa-thumbs-up text-sm"></i> <span>${likesCount}</span></button></div>`;
+          const card = document.createElement("div"); card.className = "bg-[#181818] border border-[#272727] p-4 sm:p-5 rounded-2xl flex flex-col gap-2.5 sm:gap-3 relative shadow-md";
+          card.innerHTML = `${canDelete ? `<button onclick="deleteCommunityPost('${p.id}')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-sm"></i></button>` : ""}<div class="flex items-center gap-3"><img src="${getAv(userData)}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-[#333]"><div><h4 class="font-bold text-xs sm:text-sm text-white">${userData?.channelName || 'Kanal'}</h4><p class="text-[10px] sm:text-xs text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</p></div></div><p class="text-xs sm:text-sm text-gray-200 whitespace-pre-line">${p.text}</p><div class="flex items-center gap-4 pt-2 border-t border-[#272727] text-xs"><button onclick="togglePostLike('${p.id}')" class="flex items-center gap-1.5 font-bold ${isLiked ? 'theme-text' : 'text-gray-400 hover:text-white'} transition-colors"><i class="fa-${isLiked ? 'solid' : 'regular'} fa-thumbs-up text-xs sm:text-sm"></i> <span>${likesCount}</span></button></div>`;
           listEl.appendChild(card);
         });
       });
@@ -979,7 +1431,7 @@
       if(!currentUser) return showToast("Beğenmek için giriş yapmalısın!", "error"); const pRef = doc(db, "posts", postId); const pSnap = await getDoc(pRef); if(!pSnap.exists()) return; const likedBy = pSnap.data().likedBy || [];
       if(likedBy.includes(currentUser.uid)) { await updateDoc(pRef, { likedBy: arrayRemove(currentUser.uid) }); } else { await updateDoc(pRef, { likedBy: arrayUnion(currentUser.uid) }); }
     };
-    window.deleteCommunityPost = async (postId) => { if(confirm("Bu gönderiyi silmek istediğinize emin misiniz?")) { await deleteDoc(doc(db, "posts", postId)); showToast("Gönderi silindi"); } };
+    window.deleteCommunityPost = async (postId) => { if(confirm("Bu gönderiyi silmek istediğinize emin misiniz?")) await deleteDoc(doc(db, "posts", postId)); };
   </script>
 </body>
 </html>
