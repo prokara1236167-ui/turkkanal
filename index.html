@@ -100,7 +100,7 @@
 
     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
       
-      <!-- Mesajlar İkonu (Yeni) -->
+      <!-- Mesajlar İkonu -->
       <div class="relative hidden sm:block" id="msgNavContainer">
         <button onclick="openMessagesView()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121212] border border-[#303030] flex items-center justify-center hover:bg-[#272727] transition-colors text-white relative text-xs sm:text-base">
           <i class="fa-solid fa-envelope"></i><span id="msgBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-500 rounded-full border-2 border-[#0f0f0f]"></span>
@@ -133,7 +133,6 @@
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#212121] border border-[#333] rounded-xl shadow-2xl py-2 z-50">
             <div class="px-4 py-3 border-b border-[#333] mb-1 bg-[#181818]"><p id="dropName" class="font-bold text-sm truncate flex items-center gap-2 text-white"></p><p id="dropEmail" class="text-xs text-gray-400 truncate mt-1"></p></div>
             <a href="javascript:void(0)" onclick="goToMyChannel()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-user-astronaut w-6 text-gray-400"></i> Kanalım</a>
-            <!-- Mobil İçin Mesajlar Menüye Eklendi -->
             <a href="javascript:void(0)" onclick="openMessagesView()" class="block sm:hidden px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-envelope w-6 text-gray-400"></i> Mesajlar <span id="msgMenuBadge" class="hidden ml-2 bg-blue-500 text-white text-[10px] px-1.5 rounded-full">Yeni</span></a>
             <a href="javascript:void(0)" onclick="openMySubscribers()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-users w-6 text-gray-400"></i> Abonelerim</a>
             <a href="javascript:void(0)" onclick="openSavedVideos()" class="block px-4 py-2.5 text-sm hover:bg-[#333] transition-colors text-white"><i class="fa-solid fa-bookmark w-6 text-gray-400"></i> Kaydedilenler</a>
@@ -221,7 +220,8 @@
 
             <div class="flex items-center gap-2 flex-wrap justify-start sm:justify-end">
               <button id="likeBtn" onclick="toggleLike()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-regular fa-thumbs-up"></i> <span id="playerLikesCount">0</span></button>
-              <button onclick="shareVideo()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
+              <!-- Paylaş Butonu artık Doğrudan Menüyü Açar -->
+              <button onclick="openShareModal(window.currentVideoId)" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
               <button id="saveBtn" onclick="toggleSave()" class="flex items-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white transition-colors"><i class="fa-regular fa-bookmark"></i> Kaydet</button>
               <button id="editVidBtn" onclick="openEditModal()" class="hidden items-center gap-2 bg-[#272727] theme-text px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-colors hover:bg-[#333]"><i class="fa-solid fa-pen-to-square"></i> Düzenle</button>
               <button id="deleteVidBtn" onclick="deleteCurrentVideo()" class="hidden items-center gap-2 bg-red-900/30 text-red-400 hover:text-white hover:bg-red-600 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold border border-red-500/30 transition-colors"><i class="fa-solid fa-trash"></i> Sil</button>
@@ -262,7 +262,7 @@
             <p id="cvStats" class="text-gray-400 text-xs sm:text-sm mt-1 cursor-pointer hover:text-white hover:underline transition-colors" title="Aboneleri Göster" onclick="if(currentChannelViewId) openSubscribersList(currentChannelViewId)"></p>
           </div>
           <div class="sm:mt-16 flex gap-2">
-            <!-- YENİ: MESAJ GÖNDER BUTONU -->
+            <!-- MESAJ GÖNDER BUTONU -->
             <button id="cvMessageBtn" onclick="startChatFromChannel()" class="hidden bg-[#272727] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-[#333] transition-colors hover:bg-[#3f3f3f]" title="Mesaj Gönder"><i class="fa-solid fa-envelope"></i></button>
             <button id="cvSubBtn" onclick="toggleSubscribeFromChannel()" class="bg-white text-black px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border border-gray-300 transition-colors hover:bg-gray-200">Abone Ol</button>
           </div>
@@ -316,10 +316,9 @@
       </div>
     </div>
 
-    <!-- 6. MESAJLAR GÖRÜNÜMÜ (YENİ) -->
+    <!-- 6. MESAJLAR GÖRÜNÜMÜ -->
     <div id="messagesView" class="hidden p-3 sm:p-6 max-w-[1200px] mx-auto min-h-full pb-16 h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] flex gap-4">
       
-      <!-- Sol Menü: Sohbet Listesi (Mobilde chat açıkken gizlenir) -->
       <div id="chatSidebar" class="w-full sm:w-1/3 lg:w-1/4 bg-[#181818] border border-[#272727] rounded-2xl flex flex-col h-full overflow-hidden shadow-xl shrink-0 transition-all">
          <div class="p-4 border-b border-[#333] font-bold text-white flex items-center justify-between gap-2 shrink-0">
             <span class="flex items-center gap-2"><i class="fa-solid fa-envelope theme-text"></i> Mesajlar</span>
@@ -329,28 +328,22 @@
          </div>
       </div>
 
-      <!-- Sağ Alan: Aktif Sohbet (Mobilde sohbet yoksa gizlenir) -->
       <div id="chatArea" class="hidden sm:flex flex-1 bg-[#181818] border border-[#272727] rounded-2xl flex-col h-full overflow-hidden shadow-xl relative transition-all">
          
-         <!-- Boş Durum -->
          <div id="chatEmptyState" class="flex-1 flex flex-col items-center justify-center text-gray-500">
             <i class="fa-solid fa-paper-plane text-4xl sm:text-5xl mb-3 opacity-50"></i>
             <p class="text-sm sm:text-base font-medium">Bir sohbet seçin veya kanaldan mesaj gönderin.</p>
          </div>
 
-         <!-- Aktif Sohbet Ekranı -->
          <div id="chatActiveState" class="hidden flex-col h-full">
-           <!-- Sohbet Üst Bar -->
            <div class="p-3 sm:p-4 border-b border-[#333] flex items-center gap-3 bg-[#121212] z-10 shrink-0 shadow-sm">
              <button onclick="closeChatMobile()" class="sm:hidden text-white w-8 h-8 rounded-full hover:bg-[#272727] transition-colors flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
              <img id="chatActiveAvatar" src="" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer border border-[#333]" onclick="if(activeChatUserId) goToChannel(activeChatUserId)">
              <h3 id="chatActiveName" class="font-bold text-white text-sm sm:text-base cursor-pointer hover:underline" onclick="if(activeChatUserId) goToChannel(activeChatUserId)"></h3>
            </div>
            
-           <!-- Sohbet Balonları -->
            <div id="chatMessagesBox" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 hide-scroll"></div>
            
-           <!-- Mesaj Yazma Alanı -->
            <div class="p-3 border-t border-[#333] bg-[#121212] flex gap-2 shrink-0 items-center">
              <input type="text" id="chatInput" placeholder="Mesaj yaz..." class="flex-1 bg-transparent border border-[#3f3f3f] focus:border-blue-500 outline-none rounded-full px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white transition-colors" onkeypress="if(event.key === 'Enter') sendChatMessage()">
              <button onclick="sendChatMessage()" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full theme-bg text-white flex items-center justify-center transition-transform hover:scale-105 shrink-0"><i class="fa-solid fa-paper-plane text-xs sm:text-sm"></i></button>
@@ -365,6 +358,25 @@
   <!-- MODALLAR                                  -->
   <!-- ========================================= -->
   
+  <!-- YENİ PAYLAŞIM / DM MODALI -->
+  <div id="shareModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-[#212121] border-t sm:border border-[#333] w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl relative flex flex-col shadow-2xl transition-transform h-[70vh] sm:max-h-[80vh]">
+        <div class="flex justify-between items-center p-4 border-b border-[#333] shrink-0">
+            <h3 class="font-bold text-white text-base"><i class="fa-solid fa-share-nodes theme-text mr-2"></i>Paylaş</h3>
+            <button onclick="closeModal('shareModal')" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-4 border-b border-[#333] shrink-0">
+            <button id="copyLinkBtn" class="w-full flex items-center justify-center gap-2 bg-[#272727] hover:bg-[#3f3f3f] text-white py-3 rounded-xl font-bold transition-colors text-sm">
+                <i class="fa-solid fa-link"></i> Bağlantıyı Kopyala
+            </button>
+        </div>
+        <div class="p-4 flex flex-col flex-1 min-h-0">
+            <h4 class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider">Arkadaşlarına DM Gönder</h4>
+            <div id="shareUsersList" class="flex-1 overflow-y-auto hide-scroll flex flex-col gap-1"></div>
+        </div>
+    </div>
+  </div>
+
   <div id="subscribersModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#212121] border border-[#333] rounded-2xl sm:rounded-3xl w-full max-w-md relative flex flex-col shadow-2xl h-[75vh] sm:h-[70vh]">
       <div class="flex justify-between items-center p-4 sm:p-5 border-b border-[#333] shrink-0">
@@ -498,13 +510,13 @@
     let allVideos = []; 
     let allUsers = []; 
     
-    // Mesajlar için Değişkenler
     let allMessages = [];
     let activeChatUserId = null;
     let messagesUnsub = null;
 
     window.currentVideoId = null; 
     window.currentUploaderId = null; 
+    window.currentShareVideoId = null; // YENİ: Paylaşılacak videonun ID'si
     let currentVideoData = null; 
     let currentChannelViewId = null;
     let viewedVideos = new Set(); 
@@ -512,7 +524,7 @@
     const isAdmin = () => currentUser && ADMIN_EMAILS.includes(currentUser.email);
     const getAv = (d) => d?.avatarUrl || `https://via.placeholder.com/150/1f1f1f/ffffff?text=${(d?.channelName || 'U').charAt(0).toUpperCase()}`;
     const getBn = (d) => d?.bannerUrl || `https://via.placeholder.com/1200x300/121212/333333?text=VidWave+Kanal`;
-    const getTh = (v) => v.thumbnailUrl || `https://via.placeholder.com/640x360/1f1f1f/555555?text=VidWave`;
+    const getTh = (v) => v?.thumbnailUrl || `https://via.placeholder.com/640x360/1f1f1f/555555?text=VidWave`;
     const getBdge = (e) => ADMIN_EMAILS.includes(e) ? `<i class="fa-solid fa-circle-check theme-text text-xs ml-1" title="Kurucu / Mod"></i>` : "";
 
     let toastTimeout; 
@@ -549,7 +561,63 @@
     window.toggleLoop = () => { const player = document.getElementById("player"); const loopBtn = document.getElementById("loopBtn"); player.loop = !player.loop; if(player.loop) { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Açık`; loopBtn.classList.add("theme-text"); showToast("Döngü açıldı"); } else { loopBtn.innerHTML = `<i class="fa-solid fa-repeat"></i> Kapalı`; loopBtn.classList.remove("theme-text"); showToast("Döngü kapatıldı"); } };
     window.toggleCinema = () => { const primary = document.getElementById("videoPrimary"); const layout = document.getElementById("watchLayout"); primary.classList.toggle("lg:w-2/3"); primary.classList.toggle("w-full"); layout.classList.toggle("flex-col"); showToast("Sinema Modu değiştirildi"); };
     window.togglePiP = async () => { try { if(document.pictureInPictureElement) await document.exitPictureInPicture(); else await document.getElementById('player').requestPictureInPicture(); } catch(e){ showToast("Mini oynatıcı bu tarayıcıda desteklenmiyor", "error"); } };
-    window.shareVideo = () => { navigator.clipboard.writeText(`https://vidwave.app/watch?v=${window.currentVideoId}`); showToast("Video linki kopyalandı!"); };
+    
+    // YENİ PAYLAŞIM FONKSİYONU
+    window.openShareModal = (videoId) => {
+        window.currentShareVideoId = videoId;
+        const listEl = document.getElementById("shareUsersList");
+        listEl.innerHTML = "";
+
+        if (!currentUser || !myChannelData) {
+            listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Kullanıcılara DM göndermek için giriş yapmalısın.</p>`;
+        } else {
+            // Kendimiz hariç herkesi göster
+            const shareableUsers = allUsers.filter(u => u.id !== currentUser.uid);
+            if(shareableUsers.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Gönderilecek kimse bulunamadı.</p>`;
+            } else {
+                shareableUsers.forEach(u => {
+                    listEl.innerHTML += `
+                        <div class="flex items-center justify-between p-2 hover:bg-[#333] rounded-xl cursor-pointer transition-colors" onclick="sendVideoToUser('${u.id}')">
+                            <div class="flex items-center gap-3">
+                                <img src="${getAv(u)}" class="w-10 h-10 rounded-full object-cover border border-[#333]">
+                                <span class="font-bold text-sm text-white">${u.channelName}</span>
+                            </div>
+                            <button class="bg-[#272727] hover:bg-blue-600 text-white text-xs px-4 py-2 rounded-full font-bold transition-colors">Gönder</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        document.getElementById("copyLinkBtn").onclick = () => {
+            navigator.clipboard.writeText(`https://vidwave.app/watch?v=${videoId}`);
+            showToast("Video linki kopyalandı!");
+            closeModal("shareModal");
+        };
+
+        openModal('shareModal');
+    };
+
+    window.sendVideoToUser = async (targetUserId) => {
+        if(!currentUser) return;
+        const text = `Bu videoya kesin bakmalısın! https://vidwave.app/watch?v=${window.currentShareVideoId}`;
+        try {
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                receiverId: targetUserId,
+                participants: [currentUser.uid, targetUserId],
+                text: text,
+                createdAt: Date.now(),
+                read: false
+            });
+            showToast("Video DM olarak gönderildi!");
+            closeModal("shareModal");
+        } catch(e) {
+            showToast("Gönderilemedi!", "error");
+            console.error(e);
+        }
+    };
 
     let shortsObserver = null;
     window.setupShortsObserver = () => {
@@ -576,7 +644,7 @@
       const homeTitleEl = document.getElementById("homeTitle"); 
       if(viewId === 'homeView' && title) { homeTitleEl.innerHTML = title; homeTitleEl.classList.remove("hidden"); } else { homeTitleEl.classList.add("hidden"); }
       if(viewId === 'shortsView') renderShorts(); 
-      if(viewId === 'messagesView') renderConversationList(); // Mesajlar sekmesi açıldığında
+      if(viewId === 'messagesView') renderConversationList(); 
       window.scrollTo(0,0);
     };
 
@@ -605,7 +673,6 @@
         const modHtml = isAdmin() ? " <span class='theme-text font-bold'>(Kurucu)</span>" : "";
         document.getElementById("dropEmail").innerHTML = user.email + modHtml;
         
-        // Mesajları Dinlemeye Başla
         startListeningMessages();
 
         const docSnap = await getDoc(doc(db, "users", user.uid));
@@ -619,7 +686,7 @@
         } else { myChannelData = null; document.getElementById("createChannelBtn").classList.remove("hidden"); document.getElementById("uploadVideoBtn").classList.add("hidden"); }
       } else { 
         document.getElementById("userSection").classList.add("hidden"); document.getElementById("guestSection").classList.remove("hidden"); myChannelData = null; 
-        if(messagesUnsub) messagesUnsub(); // Çıkış yapınca dinlemeyi durdur
+        if(messagesUnsub) messagesUnsub(); 
       }
     });
 
@@ -633,7 +700,7 @@
       messagesUnsub = onSnapshot(q, (snap) => {
           let msgs = [];
           snap.forEach(d => msgs.push({id: d.id, ...d.data()}));
-          msgs.sort((a, b) => a.createdAt - b.createdAt); // Tarihe göre sırala
+          msgs.sort((a, b) => a.createdAt - b.createdAt); 
           allMessages = msgs;
           
           updateUnreadMessagesBadge();
@@ -670,20 +737,46 @@
         openChatWithUser(currentChannelViewId);
     };
 
+    // YENİ: VİDEO LİNKLERİNİ TIKLANABİLİR ŞIK KARTLARA ÇEVİREN FONKSİYON
+    function formatMessageWithCards(text) {
+        let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        
+        // Linki algıla ve kart HTML'ine dönüştür
+        const urlRegex = /(https:\/\/vidwave\.app\/watch\?v=([a-zA-Z0-9_-]+))/g;
+        
+        return safeText.replace(urlRegex, (match, fullUrl, vId) => {
+            const linkedVid = allVideos.find(v => v.id === vId);
+            if (linkedVid) {
+                const safeTitle = (linkedVid.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
+                <div class="mt-2 w-48 sm:w-60 bg-[#121212] border border-[#3f3f3f] rounded-xl overflow-hidden cursor-pointer hover:border-gray-400 transition-all shadow-lg select-none" onclick="switchView('watchView'); setTimeout(() => playVideo('${linkedVid.id}', allVideos.find(v=>v.id==='${linkedVid.id}')), 100)">
+                    <div class="w-full aspect-video bg-black relative">
+                        <img src="${getTh(linkedVid)}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-play text-white text-3xl drop-shadow-md"></i>
+                        </div>
+                    </div>
+                    <div class="p-2.5">
+                        <h4 class="text-xs font-bold text-white line-clamp-2 leading-snug">${safeTitle}</h4>
+                        <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-user-astronaut text-[9px]"></i> ${linkedVid.channelName}</p>
+                    </div>
+                </div>`;
+            }
+            return `<a href="${match}" target="_blank" class="underline text-blue-300 hover:text-blue-200 break-all">${match}</a>`;
+        });
+    }
+
     function renderConversationList() {
         const listEl = document.getElementById("conversationList");
         listEl.innerHTML = "";
         
-        // Benzersiz konuştuğumuz kişileri bul
         const contactsMap = new Map();
         
-        // Önce allUsers'dan boş da olsa birini tıkladıysak (Henüz mesaj yoksa) onu listeye sahte ekleyelim
         if(activeChatUserId && !allMessages.some(m => m.participants.includes(activeChatUserId))) {
            const u = allUsers.find(x => x.id === activeChatUserId);
            if(u) contactsMap.set(activeChatUserId, { user: u, lastMsg: null });
         }
 
-        // Geçmiş mesajları grupla
         const sortedMsgsDesc = [...allMessages].reverse();
         sortedMsgsDesc.forEach(msg => {
             const otherUid = msg.senderId === currentUser.uid ? msg.receiverId : msg.senderId;
@@ -703,7 +796,12 @@
             const m = data.lastMsg;
             const isUnread = m && m.receiverId === currentUser.uid && !m.read;
             
-            const msgText = m ? (m.senderId === currentUser.uid ? `Sen: ${m.text}` : m.text) : "Yeni sohbet başlatın";
+            // Son mesaj video ise preview yazısı göster
+            let msgText = "Yeni sohbet başlatın";
+            if (m) {
+                if (m.text.includes("vidwave.app/watch?v=")) msgText = m.senderId === currentUser.uid ? "Sen bir video gönderdin" : "Bir video gönderdi";
+                else msgText = m.senderId === currentUser.uid ? `Sen: ${m.text}` : m.text;
+            }
             
             const card = document.createElement("div");
             card.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${activeChatUserId === otherUid ? 'bg-[#333]' : 'hover:bg-[#272727]'} ${isUnread ? 'border-l-2 border-blue-500 bg-[#272727]/50' : 'border-l-2 border-transparent'}`;
@@ -721,9 +819,8 @@
 
     window.openChatWithUser = (userId) => {
         activeChatUserId = userId;
-        renderConversationList(); // Seçili rengi güncelle
+        renderConversationList(); 
         
-        // Mobil görünümde Sidebar gizle, Sohbet alanını göster
         if(window.innerWidth < 640) {
             document.getElementById("chatSidebar").classList.add("hidden");
             document.getElementById("chatArea").classList.remove("hidden");
@@ -755,14 +852,13 @@
 
         const chatMsgs = allMessages.filter(m => m.participants.includes(userId));
         
-        // Okunmadı olarak işaretlenen mesajları okundu yap
         let batchUpdates = [];
         chatMsgs.forEach(m => {
             if(m.receiverId === currentUser.uid && !m.read) {
                 batchUpdates.push(updateDoc(doc(db, "messages", m.id), { read: true }));
             }
         });
-        if(batchUpdates.length > 0) Promise.all(batchUpdates); // Arka planda güncelle
+        if(batchUpdates.length > 0) Promise.all(batchUpdates); 
 
         if(chatMsgs.length === 0) {
             box.innerHTML = `<div class="text-center text-xs text-gray-500 py-10">Burası biraz sessiz. İlk mesajı sen gönder!</div>`;
@@ -778,11 +874,14 @@
                     lastDate = msgDate;
                 }
 
+                // Mesajı güvenli hale getir ve içinde video linki varsa karta dönüştür
+                const finalFormattedText = formatMessageWithCards(m.text);
+
                 const msgDiv = document.createElement("div");
-                msgDiv.className = `flex flex-col max-w-[75%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
+                msgDiv.className = `flex flex-col max-w-[85%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
                 msgDiv.innerHTML = `
-                    <div class="px-3 py-2 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-[#272727] text-gray-200 rounded-tl-sm'} text-xs sm:text-sm whitespace-pre-line shadow-sm">
-                        ${m.text}
+                    <div class="px-3 py-2 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-[#272727] text-gray-200 rounded-tl-sm'} text-xs sm:text-sm shadow-sm flex flex-col">
+                        ${finalFormattedText}
                     </div>
                     <span class="text-[9px] sm:text-[10px] text-gray-500 mt-1 flex items-center gap-1">
                        ${msgTime} ${isMe ? (m.read ? '<i class="fa-solid fa-check-double text-blue-400"></i>' : '<i class="fa-solid fa-check text-gray-500"></i>') : ''}
@@ -792,18 +891,18 @@
             });
         }
         
-        // Scroll en alta
         setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
         document.getElementById("chatInput").focus();
     }
 
     window.sendChatMessage = async () => {
-        if(!currentUser || !activeChatUserId) return;
+        if(!currentUser) return showToast("Giriş yapmalısın!", "error");
+        if(!activeChatUserId) return showToast("Sohbet seçilmedi!", "error");
+        
         const input = document.getElementById("chatInput");
         const text = input.value.trim();
         if(!text) return;
         
-        input.value = "";
         try {
             await addDoc(collection(db, "messages"), {
                 senderId: currentUser.uid,
@@ -813,16 +912,16 @@
                 createdAt: Date.now(),
                 read: false
             });
-            // Hızlı hissettirmesi için anında scroll (Snapshot zaten güncelleyecek)
+            input.value = "";
             setTimeout(() => {
                 const box = document.getElementById("chatMessagesBox");
-                box.scrollTop = box.scrollHeight;
+                if(box) box.scrollTop = box.scrollHeight;
             }, 100);
         } catch(e) {
-            showToast("Mesaj gönderilemedi", "error");
+            console.error("Mesaj Gönderme Hatası:", e);
+            showToast("Hata: " + e.message, "error");
         }
     };
-
 
     function renderNotifs(notifs) {
       const list = document.getElementById("notifList"); const badge = document.getElementById("notifBadge"); list.innerHTML = ""; 
@@ -876,7 +975,6 @@
     window.openSavedVideos = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-bookmark theme-text mr-2"></i> Kaydedilen Videolar'); const savedList = myChannelData.savedVideos || []; renderVideoGrid(allVideos.filter(v => savedList.includes(v.id))); };
     window.openHistory = () => { if(!myChannelData) return; switchView('homeView', '<i class="fa-solid fa-clock-rotate-left theme-text mr-2"></i> İzleme Geçmişi'); const historyList = myChannelData.history || []; const filteredVideos = allVideos.filter(v => historyList.includes(v.id)); filteredVideos.sort((a, b) => historyList.indexOf(b.id) - historyList.indexOf(a.id)); renderVideoGrid(filteredVideos); };
 
-    // Aboneleri Gösterme Fonksiyonu
     window.openSubscribersList = (userId) => {
         const user = allUsers.find(u => u.id === userId);
         if(!user) return;
@@ -957,7 +1055,6 @@
       else { const filtered = allVideos.filter(v => v.category === catName); renderVideoGrid(filtered); }
     };
     
-    // Gelişmiş Arama Listener'ı
     document.getElementById("searchInput").addEventListener("input", (e) => { 
         const searchTerm = e.target.value.toLowerCase().trim(); 
         if(document.getElementById('homeView').classList.contains('hidden')) switchView('homeView'); 
@@ -968,10 +1065,7 @@
             return;
         }
 
-        // Kanalları Filtrele
         const searchChannels = allUsers.filter(u => u.channelName && u.channelName.toLowerCase().includes(searchTerm));
-        
-        // Videoları Filtrele
         const seenVideoIds = new Set();
         const searchVideos = [];
         for (let v of allVideos) {
@@ -1102,7 +1196,8 @@
                 </div>
                 <span class="text-[11px] sm:text-xs text-white font-bold drop-shadow-md">Kaydet</span>
               </button>
-              <button onclick="shareShort('${video.id}')" class="flex flex-col items-center gap-1 group">
+              <!-- Shorts Paylaş Butonu Doğrudan Menüyü Açar -->
+              <button onclick="openShareModal('${video.id}')" class="flex flex-col items-center gap-1 group">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-black/60 transition">
                    <i class="fa-solid fa-share text-white text-xl sm:text-2xl"></i>
                 </div>
@@ -1205,7 +1300,7 @@
     window.toggleShortSave = async (id) => {
       if(!myChannelData) return showToast("Kaydetmek için giriş yapıp kanal oluşturun.", "error"); 
       const userRef = doc(db, "users", currentUser.uid); let savedList = myChannelData.savedVideos || []; const saveIcon = document.getElementById(`shortSaveIcon_${id}`);
-      if(savedList.includes(id)) { await updateDoc(userRef, { savedVideos: arrayRemove(id) }); myChannelData.savedVideos = savedList.filter(vid => vid !== id); if(saveIcon) saveIcon.className = "fa-regular fa-bookmark text-white text-xl sm:text-2xl transition-colors"; showToast("Kaydedilenlerden çıkarıldı"); } 
+      if(savedList.includes(id)) { await updateDoc(userRef, { savedVideos: arrayRemove(id) }); myChannelData.savedVideos = savedList.filter(vid => vid !== id); if(saveIcon) saveIcon.className = "fa-regular fa-bookmark text-white text-xl sm:text-2xl transition-colors showToast("Kaydedilenlerden çıkarıldı"); } 
       else { await updateDoc(userRef, { savedVideos: arrayUnion(id) }); myChannelData.savedVideos.push(id); if(saveIcon) saveIcon.className = "fa-solid fa-bookmark theme-text text-xl sm:text-2xl transition-colors"; showToast("Video kaydedildi!"); } 
     };
 
@@ -1286,7 +1381,6 @@
       const snap = await getDoc(doc(db, "users", userId)); const userData = snap.exists() ? snap.data() : { channelName: 'Bilinmiyor', subscribers: [] };
       document.getElementById("channelBanner").style.backgroundImage = `url('${getBn(userData)}')`; document.getElementById("cvAvatar").src = getAv(userData); document.getElementById("cvName").innerHTML = userData.channelName + getBdge(userData.email); document.getElementById("cvStats").textContent = `${(userData.subscribers || []).length} Abone`;
       
-      // DM butonu göster/gizle
       const msgBtn = document.getElementById("cvMessageBtn");
       if(currentUser && currentUser.uid !== userId) msgBtn.classList.remove("hidden"); else msgBtn.classList.add("hidden");
 
